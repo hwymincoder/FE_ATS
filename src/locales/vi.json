@@ -1,0 +1,78 @@
+{
+  "common": {
+    "btn": {
+      "add": "Thêm mới",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận",
+      "close": "Đóng",
+      "search": "Tìm kiếm",
+      "reset": "Đặt lại",
+      "export": "Xuất Excel",
+      "import": "Nhập Excel",
+      "print": "In",
+      "approve": "Duyệt",
+      "reject": "Từ chối"
+    },
+    "msg": {
+      "success": "Thao tác thành công",
+      "error": "Thao tác thất bại",
+      "warning": "Cảnh báo",
+      "confirm": "Xác nhận",
+      "confirmDelete": "Bạn có chắc muốn xóa bản ghi này?",
+      "saveSuccess": "Lưu thành công",
+      "deleteSuccess": "Xóa thành công",
+      "loadError": "Không thể tải dữ liệu"
+    },
+    "error": {
+      "common": "Đã xảy ra lỗi, vui lòng thử lại",
+      "required": "Trường này bắt buộc",
+      "email": "Email không hợp lệ",
+      "phone": "Số điện thoại không hợp lệ",
+      "fileNotFound": "Không tìm thấy file"
+    },
+    "validate": {
+      "required": "Trường này bắt buộc nhập",
+      "email": "Email không hợp lệ",
+      "phone": "Số điện thoại không hợp lệ",
+      "minLength": "Ít nhất {min} ký tự",
+      "maxLength": "Tối đa {max} ký tự"
+    },
+    "table": {
+      "noData": "Không có dữ liệu",
+      "loading": "Đang tải...",
+      "total": "Tổng cộng: {total} bản ghi"
+    },
+    "paging": {
+      "page": "Trang",
+      "of": "của",
+      "show": "Hiển thị",
+      "items": "bản ghi"
+    }
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "category": "Danh mục",
+    "goods": "Hàng hóa",
+    "sale": "Bán hàng",
+    "inventory": "Kho hàng",
+    "report": "Báo cáo",
+    "system": "Hệ thống",
+    "user": "Người dùng"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "loginSuccess": "Đăng nhập thành công",
+    "loginFailed": "Tên đăng nhập hoặc mật khẩu không đúng"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Chào mừng đến với hệ thống"
+  }
+}
