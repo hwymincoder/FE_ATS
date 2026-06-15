@@ -1,22 +1,28 @@
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { ConfigProvider } from 'antd';
-import viVN from 'antd/locale/vi_VN';
-import store from './stores/store.js';
-import AppRouter from './routes/AppRouter.jsx';
-import './locales/i18n.js';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 
-const App = () => {
+import AppRouter from '@/routes';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
+
+export default function App() {
   return (
-    <Provider store={store}>
-      <ConfigProvider locale={viVN}>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
-      </ConfigProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <AppRouter />
+      <Toaster richColors position="top-right" />
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+    </QueryClientProvider>
   );
-};
-
-export default App;
+}

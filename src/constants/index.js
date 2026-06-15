@@ -1,3 +1,16 @@
-export { PATH } from './AppPath.js';
-export { default as Constants } from './Constants.js';
-export { APP_PROPS } from './AppProps.js';
+export const APP_NAME = 'FE_ATS';
+
+export const ROLES = {
+  ADMIN: 'admin',
+  USER: 'user',
+};
+
+export const STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+};
+
+export const STORAGE_KEYS = {
+  AUTH: 'fe-ats-auth',
+  UI: 'fe-ats-ui',
+};

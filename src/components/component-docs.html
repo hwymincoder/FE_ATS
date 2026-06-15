@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI Components - ATS WEB</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#1d2329;background:#fff;display:flex;min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+/* Sidebar */
+#sidebar{width:260px;min-width:260px;background:#f9fafb;border-right:1px solid #e8eaf0;height:100vh;position:sticky;top:0;overflow-y:auto;padding:0 0 40px}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid #e8eaf0;margin-bottom:8px}
+.sidebar-logo h2{font-size:16px;font-weight:700;color:#105E96}
+.sidebar-logo span{font-size:11px;color:#8c9199;display:block;margin-top:2px}
+.nav-group{padding:4px 12px}
+.nav-group-title{font-size:11px;font-weight:600;color:#8c9199;text-transform:uppercase;letter-spacing:.08em;padding:10px 8px 4px}
+.nav-item{display:flex;align-items:center;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:13px;color:#4b5563;transition:all .15s;gap:6px}
+.nav-item:hover{background:#eef0f5;color:#105E96}
+.nav-item.active{background:#105E96;color:#fff}
+.nav-item .badge{margin-left:auto;font-size:10px;background:#e8eaf0;color:#6b7280;padding:1px 6px;border-radius:10px}
+.nav-item.active .badge{background:rgba(255,255,255,.25);color:#fff}
+
+/* Main content */
+#main{flex:1;overflow-y:auto;padding:40px 48px;max-width:1400px}
+.page-header{margin-bottom:40px;padding-bottom:24px;border-bottom:1px solid #e8eaf0}
+.page-header h1{font-size:28px;font-weight:700;color:#0f172a;margin-bottom:8px}
+.page-header p{color:#6b7280;font-size:15px;line-height:1.6}
+
+/* Section */
+.section{margin-bottom:56px}
+.section-title{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.section-title .tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:12px;background:#eef2ff;color:#3730a3}
+.section-desc{color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6}
+.section-divider{border:none;border-top:1px solid #e8eaf0;margin:48px 0}
+
+/* Component card */
+.comp-card{border:1px solid #e8eaf0;border-radius:10px;overflow:visible;margin-bottom:24px}
+.comp-card-header{padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e8eaf0;display:flex;align-items:center;justify-content:space-between;border-radius:10px 10px 0 0}
+.comp-card-header h3{font-size:15px;font-weight:600;color:#0f172a}
+.comp-card-header .comp-tag{font-size:11px;padding:2px 8px;border-radius:12px;background:#fff;border:1px solid #e8eaf0;color:#6b7280}
+.comp-body{padding:20px}
+.comp-desc{font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.6}
+
+/* Props table */
+.props-table{width:100%;border-collapse:collapse;font-size:12.5px;border-radius:8px;overflow:hidden;border:1px solid #e8eaf0}
+.props-table th{background:#f3f4f6;padding:9px 14px;text-align:left;font-weight:600;color:#374151;border-bottom:1px solid #e8eaf0}
+.props-table td{padding:8px 14px;border-bottom:1px solid #f3f4f6;color:#374151;vertical-align:top}
+.props-table tr:last-child td{border-bottom:none}
+.props-table tr:hover td{background:#fafafa}
+.type-badge{display:inline-block;font-family:'Fira Mono',monospace;font-size:11px;background:#d9f2fd;color:#105E96;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.default-badge{display:inline-block;font-family:'Fira Mono',monospace;font-size:11px;background:#f9fafb;color:#6b7280;padding:1px 6px;border-radius:4px}
+.required-dot{color:#ef4444;font-weight:700;margin-left:2px}
+
+/* Demo area */
+.demo-area{background:#f9fafb;border:1px solid #e8eaf0;border-radius:8px;padding:24px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;overflow:visible}
+
+/* ===== ATS WEB UI DEMO STYLES ===== */
+
+/* Button demos - matching ATS_WEB button.jsx */
+.at-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid transparent;white-space:nowrap;line-height:1;transition:all .15s}
+.at-btn svg{display:block;flex-shrink:0;width:16px;height:16px}
+.at-btn-primary{background:#105E96;color:#fff;border:none}
+.at-btn-primary:hover{background:#0d4f80}
+.at-btn-destructive{background:#dc2626;color:#fff;border:none}
+.at-btn-destructive:hover{background:#b91c1c}
+.at-btn-outline{border:1px solid #d1d5db;background:#fff;color:#374151}
+.at-btn-outline:hover{background:#f9fafb;border-color:#9ca3af}
+.at-btn-secondary{background:#e5e7eb;color:#374151;border:none}
+.at-btn-secondary:hover{background:#d1d5db}
+.at-btn-ghost{background:transparent;border:none;color:#374151}
+.at-btn-ghost:hover{background:#f3f4f6}
+.at-btn-link{background:transparent;border:none;color:#105E96;text-decoration:underline;padding:0}
+.at-btn-sm{padding:6px 12px;font-size:13px}
+.at-btn-lg{padding:10px 24px;font-size:15px}
+.at-btn-icon{width:40px;height:40px;padding:0;border:1px solid #d1d5db;background:#fff}
+.at-btn-icon:hover{background:#f3f4f6}
+
+/* Input demos */
+.at-input{height:40px;padding:0 14px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;width:260px;outline:none;color:#374151;background:#fff;transition:border-color .15s,box-shadow .15s}
+.at-input:focus{border-color:#105E96;box-shadow:0 0 0 3px rgba(16,94,150,.1)}
+.at-input::placeholder{color:#9ca3af}
+.at-input:disabled{background:#f9fafb;color:#9ca3af;cursor:not-allowed}
+
+/* Label demo */
+.at-label{display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:6px}
+
+/* Textarea demo */
+.at-textarea{width:100%;min-height:80px;padding:10px 14px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;color:#374151;resize:vertical;outline:none;font-family:inherit}
+.at-textarea:focus{border-color:#105E96;box-shadow:0 0 0 3px rgba(16,94,150,.1)}
+
+/* Card demos */
+.at-card{border:1px solid #e8eaf0;border-radius:10px;overflow:hidden;width:100%;max-width:340px}
+.at-card-header{padding:20px 20px 16px;border-bottom:1px solid #e8eaf0}
+.at-card-title{font-size:18px;font-weight:600;color:#0f172a}
+.at-card-desc{font-size:13px;color:#6b7280;margin-top:4px}
+.at-card-content{padding:20px}
+.at-card-footer{padding:16px 20px;border-top:1px solid #e8eaf0;display:flex;gap:8px}
+
+/* Badge demos */
+.at-badge{display:inline-flex;align-items:center;border-radius:4px;font-size:12px;font-weight:600;padding:2px 8px;border:1px solid transparent}
+.at-badge-default{background:#f3f4f6;color:#374151;border-color:#e5e7eb}
+.at-badge-secondary{background:#e5e7eb;color:#374151;border-color:#d1d5db}
+.at-badge-destructive{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.at-badge-outline{border-color:#d1d5db;color:#374151;background:#fff}
+
+/* Dialog / Modal demos */
+.at-dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000}
+.at-dialog{background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.15);padding:24px;width:100%;max-width:480px;position:relative}
+.at-dialog-header{margin-bottom:16px}
+.at-dialog-title{font-size:16px;font-weight:600;color:#0f172a}
+.at-dialog-desc{font-size:13px;color:#6b7280;margin-top:4px}
+.at-dialog-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:18px;color:#9ca3af;display:flex;align-items:center;justify-content:center}
+.at-dialog-close:hover{background:#f3f4f6;color:#374151}
+.at-dialog-body{font-size:14px;color:#374151;line-height:1.6;margin-bottom:20px}
+.at-dialog-footer{display:flex;gap:8px;justify-content:flex-end}
+.at-dialog-x{font-size:20px;line-height:1}
+
+/* Select demos */
+.at-select-wrap{position:relative;width:260px}
+.at-select{height:40px;padding:0 14px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;color:#374151;background:#fff;cursor:pointer;outline:none;width:100%;appearance:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
+.at-select:focus{border-color:#105E96;box-shadow:0 0 0 3px rgba(16,94,150,.1)}
+.at-select-arrow{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#6b7280;font-size:12px}
+
+/* Table demos */
+.at-table-wrap{width:100%;overflow-x:auto;border:1px solid #e8eaf0;border-radius:8px}
+.at-table{width:100%;border-collapse:collapse;font-size:13px}
+.at-table th{background:#f9fafb;padding:10px 16px;text-align:left;font-weight:600;color:#374151;border-bottom:1px solid #e8eaf0;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.at-table td{padding:10px 16px;border-bottom:1px solid #f3f4f6;color:#374151}
+.at-table tr:last-child td{border-bottom:none}
+.at-table tr:hover td{background:#fafafa}
+
+/* Separator demo */
+.at-separator{height:1px;background:#e8eaf0;margin:16px 0}
+.at-separator-v{display:inline-block;width:1px;height:40px;background:#e8eaf0;vertical-align:middle;margin:0 16px}
+
+/* Dropdown demos */
+.at-dropdown-wrap{position:relative;display:inline-block}
+.at-dropdown{background:#fff;border:1px solid #e8eaf0;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.1);padding:4px 0;min-width:160px;position:absolute;top:calc(100% + 4px);left:0;z-index:200;display:none}
+.at-dropdown.show{display:block}
+.at-dropdown-item{padding:8px 14px;font-size:13px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
+.at-dropdown-item:hover{background:#f3f4f6}
+.at-dropdown-item.danger{color:#dc2626}
+.at-dropdown-item.danger:hover{background:#fef2f2}
+.at-dropdown-sep{height:1px;background:#e8eaf0;margin:4px 0}
+.at-dropdown-label{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;padding:6px 14px 4px}
+
+/* Code / import block */
+.code-block{background:#1e293b;color:#e2e8f0;border-radius:8px;padding:16px 20px;font-family:'Fira Mono','Consolas',monospace;font-size:12.5px;line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:8px}
+.code-keyword{color:#c084fc}
+.code-string{color:#86efac}
+.code-comment{color:#64748b}
+.code-component{color:#67e8f9}
+.code-prop{color:#fcd34d}
+.code-tag{color:#f9a8d4}
+
+/* Sub-components sub-section */
+.sub-section{margin-top:16px}
+.sub-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f3f4f6}
+
+/* Responsive */
+@media(max-width:900px){#sidebar{display:none}#main{padding:24px}}
+
+/* Anchor links scroll */
+html{scroll-behavior:smooth}
+.anchor-link{color:#9ca3af;font-size:13px;margin-left:8px;opacity:0;transition:opacity .2s}
+.section-title:hover .anchor-link{opacity:1}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h2>ATS UI</h2>
+    <span>Thư viện component - Shadcn/UI + Radix</span>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Tổng quan</div>
+    <a href="#overview" class="nav-item active">Giới thiệu</a>
+    <a href="#button" class="nav-item">Button</a>
+    <a href="#input" class="nav-item">Input</a>
+    <a href="#textarea" class="nav-item">Textarea</a>
+    <a href="#label" class="nav-item">Label</a>
+    <a href="#select" class="nav-item">Select</a>
+    <a href="#badge" class="nav-item">Badge</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Layout</div>
+    <a href="#card" class="nav-item">Card</a>
+    <a href="#separator" class="nav-item">Separator</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Overlay</div>
+    <a href="#dialog" class="nav-item">Dialog</a>
+    <a href="#dropdown-menu" class="nav-item">DropdownMenu</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Data Display</div>
+    <a href="#table" class="nav-item">Table</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Dependencies</div>
+    <a href="#deps" class="nav-item">Thư viện cần cài</a>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ========== OVERVIEW ========== -->
+  <section id="overview" class="section">
+    <div class="page-header">
+      <h1>ATS WEB UI Components</h1>
+      <p>Thư viện component dùng chung xây dựng trên nền tảng <strong>Shadcn/UI</strong> và <strong>Radix UI Primitives</strong>, sử dụng <strong>Tailwind CSS</strong> cho styling và <strong>class-variance-authority</strong> cho variant system. Bao gồm 11 component cơ bản phục vụ các nghiệp vụ nhập liệu, hiển thị và tương tác.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+      <div style="background:#f9fafb;border:1px solid #e8eaf0;border-radius:10px;padding:20px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#105E96">11</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px">Components</div>
+      </div>
+      <div style="background:#f9fafb;border:1px solid #e8eaf0;border-radius:10px;padding:20px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#33B54D">6</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px">Button Variants</div>
+      </div>
+      <div style="background:#f9fafb;border:1px solid #e8eaf0;border-radius:10px;padding:20px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#366AE2">Radix UI</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px">Accessibility</div>
+      </div>
+      <div style="background:#f9fafb;border:1px solid #e8eaf0;border-radius:10px;padding:20px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#FC6B03">Javascript</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px">Fully supported</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== BUTTON ========== -->
+  <section id="button" class="section">
+    <div class="section-title">Button <span class="tag">Action</span></div>
+    <div class="section-desc">Nút bấm với nhiều variants và sizes, hỗ trợ <code>asChild</code> để render thành component khác (dùng <code>Slot</code> từ Radix). Đặt tại <code>src/components/ui/button.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">button.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">6 variants: <strong>default</strong>, <strong>destructive</strong>, <strong>outline</strong>, <strong>secondary</strong>, <strong>ghost</strong>, <strong>link</strong>. 4 sizes: <strong>default</strong>, <strong>sm</strong>, <strong>lg</strong>, <strong>icon</strong>.</p>
+        <div class="demo-area">
+          <button class="at-btn at-btn-primary">Default</button>
+          <button class="at-btn at-btn-destructive">Destructive</button>
+          <button class="at-btn at-btn-outline">Outline</button>
+          <button class="at-btn at-btn-secondary">Secondary</button>
+          <button class="at-btn at-btn-ghost">Ghost</button>
+          <button class="at-btn at-btn-link">Link</button>
+        </div>
+        <div class="demo-area">
+          <button class="at-btn at-btn-primary at-btn-sm">Small</button>
+          <button class="at-btn at-btn-primary">Default</button>
+          <button class="at-btn at-btn-primary at-btn-lg">Large</button>
+          <button class="at-btn at-btn-primary at-btn-icon">+</button>
+        </div>
+        <div class="demo-area">
+          <button class="at-btn at-btn-outline" disabled>Disabled</button>
+          <button class="at-btn at-btn-primary" onclick="this.innerText='Loading...';this.style.opacity='0.6'">With Loading</button>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> { Button, buttonVariants } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/button'</span>;
+
+<span class="code-comment">// Basic usage</span>
+&lt;<span class="code-component">Button</span>>Click me&lt;/<span class="code-component">Button</span>>
+
+<span class="code-comment">// With variant & size</span>
+&lt;<span class="code-component">Button</span> <span class="code-prop">variant</span>=<span class="code-string">"destructive"</span> <span class="code-prop">size</span>=<span class="code-string">"sm"</span>>Delete&lt;/<span class="code-component">Button</span>>
+
+<span class="code-comment">// Render as different element (uses Radix Slot)</span>
+&lt;<span class="code-component">Button</span> <span class="code-prop">asChild</span>>
+  &lt;<span class="code-tag">a</span> <span class="code-prop">href</span>=<span class="code-string">"/dashboard"</span>>Go to Dashboard&lt;/<span class="code-tag">a</span>>
+&lt;/<span class="code-component">Button</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Props</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>variant</code><span class="required-dot">*</span></td><td><span class="type-badge">string</span></td><td><span class="default-badge">default</span></td><td>Style variant: <code>default</code> | <code>destructive</code> | <code>outline</code> | <code>secondary</code> | <code>ghost</code> | <code>link</code></td></tr>
+            <tr><td><code>size</code></td><td><span class="type-badge">string</span></td><td><span class="default-badge">default</span></td><td>Size: <code>default</code> | <code>sm</code> | <code>lg</code> | <code>icon</code></td></tr>
+            <tr><td><code>asChild</code></td><td><span class="type-badge">boolean</span></td><td><span class="default-badge">false</span></td><td>Dùng <code>Slot</code> để merge props vào child element thay vì bọc thêm <code>&lt;button&gt;</code></td></tr>
+            <tr><td><code>className</code></td><td><span class="type-badge">string</span></td><td>-</td><td>Custom Tailwind classes bổ sung</td></tr>
+            <tr><td><code>ref</code></td><td><span class="type-badge">RefObject</span></td><td>-</td><td>Forwarded ref</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== INPUT ========== -->
+  <section id="input" class="section">
+    <div class="section-title">Input <span class="tag">Input</span></div>
+    <div class="section-desc">Trường nhập text đơn, hỗ trợ mọi <code>type</code> HTML input. Đặt tại <code>src/components/ui/input.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">input.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">Styled với border, focus ring, placeholder, disabled state.</p>
+        <div class="demo-area" style="flex-direction:column;align-items:flex-start;gap:14px">
+          <input class="at-input" type="text" placeholder="Enter text...">
+          <input class="at-input" type="email" placeholder="Email address">
+          <input class="at-input" type="password" placeholder="Password">
+          <input class="at-input" type="search" placeholder="Search...">
+          <input class="at-input" type="number" placeholder="0" style="width:120px">
+          <input class="at-input" type="file" style="height:auto;padding:8px 14px;cursor:pointer">
+          <input class="at-input" type="text" placeholder="Disabled" disabled>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> { Input } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/input'</span>;
+
+&lt;<span class="code-component">Input</span> <span class="code-prop">type</span>=<span class="code-string">"email"</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Email address"</span> /&gt;
+&lt;<span class="code-component">Input</span> <span class="code-prop">type</span>=<span class="code-string">"password"</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Password"</span> /&gt;
+&lt;<span class="code-component">Input</span> <span class="code-prop">disabled</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Disabled"</span> /&gt;
+&lt;<span class="code-component">Input</span> <span class="code-prop">className</span>=<span class="code-string">"w-48"</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Custom width"</span> /&gt;</div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Props</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Prop</th><th>Type</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>type</code></td><td><span class="type-badge">string</span></td><td>Loại input HTML: <code>text</code> | <code>email</code> | <code>password</code> | <code>number</code> | <code>search</code> | <code>file</code> | ...</td></tr>
+            <tr><td><code>className</code></td><td><span class="type-badge">string</span></td><td>Custom Tailwind classes bổ sung</td></tr>
+            <tr><td><code>ref</code></td><td><span class="type-badge">RefObject</span></td><td>Forwarded ref</td></tr>
+            <tr><td>Tất cả props khác</td><td><span class="type-badge">HTML input attrs</span></td><td>Được spread vào thẻ <code>&lt;input&gt;</code> gốc</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TEXTAREA ========== -->
+  <section id="textarea" class="section">
+    <div class="section-title">Textarea <span class="tag">Input</span></div>
+    <div class="section-desc">Trường nhập văn bản nhiều dòng. Đặt tại <code>src/components/ui/textarea.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">textarea.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">Tương tự Input nhưng hỗ trợ resize dọc và nhiều dòng.</p>
+        <div class="demo-area" style="flex-direction:column;align-items:flex-start;gap:14px">
+          <textarea class="at-textarea" placeholder="Enter description..."></textarea>
+          <textarea class="at-textarea" style="min-height:120px" placeholder="Large textarea (min-h-[120px])..."></textarea>
+          <textarea class="at-textarea" placeholder="Disabled" disabled></textarea>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> { Textarea } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/textarea'</span>;
+
+&lt;<span class="code-component">Textarea</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Enter description..."</span> /&gt;
+&lt;<span class="code-component">Textarea</span> <span class="code-prop">className</span>=<span class="code-string">"min-h-[120px]"</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Large textarea"</span> /&gt;
+&lt;<span class="code-component">Textarea</span> <span class="code-prop">disabled</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Disabled"</span> /&gt;</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LABEL ========== -->
+  <section id="label" class="section">
+    <div class="section-title">Label <span class="tag">Input</span></div>
+    <div class="section-desc">Nhãn cho form field, built trên <code>@radix-ui/react-label</code> để đảm bảo accessibility. Đặt tại <code>src/components/ui/label.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">label.jsx</span></div>
+      <div class="comp-body">
+        <div class="demo-area" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <label class="at-label" for="demo-name">Full Name</label>
+          <input class="at-input" id="demo-name" type="text" placeholder="John Doe">
+          <label class="at-label" style="font-weight:700;color:#105E96">Custom styled label</label>
+          <label class="at-label" style="color:#9ca3af;cursor:not-allowed" for="demo-disabled">Disabled Input Label</label>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> { Label } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/label'</span>;
+
+&lt;<span class="code-component">Label</span> <span class="code-prop">htmlFor</span>=<span class="code-string">"email"</span>>Email Address&lt;/<span class="code-component">Label</span>>
+&lt;<span class="code-component">Input</span> <span class="code-prop">id</span>=<span class="code-string">"email"</span> <span class="code-prop">type</span>=<span class="code-string">"email"</span> /&gt;
+
+<span class="code-comment">// Custom style</span>
+&lt;<span class="code-component">Label</span> <span class="code-prop">className</span>=<span class="code-string">"font-bold text-red-600"</span>>Required field&lt;/<span class="code-component">Label</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Props</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Prop</th><th>Type</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>htmlFor</code></td><td><span class="type-badge">string</span></td><td>Liên kết với input qua <code>id</code> (tương tự for attribute)</td></tr>
+            <tr><td><code>className</code></td><td><span class="type-badge">string</span></td><td>Custom Tailwind classes bổ sung</td></tr>
+            <tr><td><code>ref</code></td><td><span class="type-badge">RefObject</span></td><td>Forwarded ref</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== BADGE ========== -->
+  <section id="badge" class="section">
+    <div class="section-title">Badge <span class="tag">Display</span></div>
+    <div class="section-desc">Tag/label nhỏ dùng để hiển thị trạng thái, sử dụng CVA cho variants. Đặt tại <code>src/components/ui/badge.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">badge.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">4 variants: <strong>default</strong>, <strong>secondary</strong>, <strong>destructive</strong>, <strong>outline</strong>.</p>
+        <div class="demo-area">
+          <span class="at-badge at-badge-default">Default</span>
+          <span class="at-badge at-badge-secondary">Secondary</span>
+          <span class="at-badge at-badge-destructive">Destructive</span>
+          <span class="at-badge at-badge-outline">Outline</span>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> { Badge } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/badge'</span>;
+
+&lt;<span class="code-component">Badge</span>>Default&lt;/<span class="code-component">Badge</span>>
+&lt;<span class="code-component">Badge</span> <span class="code-prop">variant</span>=<span class="code-string">"secondary"</span>>Secondary&lt;/<span class="code-component">Badge</span>>
+&lt;<span class="code-component">Badge</span> <span class="code-prop">variant</span>=<span class="code-string">"destructive"</span>>Error&lt;/<span class="code-component">Badge</span>>
+&lt;<span class="code-component">Badge</span> <span class="code-prop">variant</span>=<span class="code-string">"outline"</span>>Outline&lt;/<span class="code-component">Badge</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Props</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>variant</code></td><td><span class="type-badge">string</span></td><td><span class="default-badge">default</span></td><td><code>default</code> | <code>secondary</code> | <code>destructive</code> | <code>outline</code></td></tr>
+            <tr><td><code>className</code></td><td><span class="type-badge">string</span></td><td>-</td><td>Custom Tailwind classes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CARD ========== -->
+  <section id="card" class="section">
+    <div class="section-title">Card <span class="tag">Layout</span></div>
+    <div class="section-desc">Container hiển thị nội dung theo khối, gồm 5 sub-components. Đặt tại <code>src/components/ui/card.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">card.jsx</span></div>
+      <div class="comp-body">
+        <div class="demo-area">
+          <div class="at-card">
+            <div class="at-card-header">
+              <div class="at-card-title">Project Dashboard</div>
+              <div class="at-card-desc">Overview of your active projects</div>
+            </div>
+            <div class="at-card-content">
+              <p style="font-size:13px;color:#6b7280;line-height:1.6">Card content goes here. You can put tables, lists, stats, or any other content inside the CardContent.</p>
+            </div>
+            <div class="at-card-footer">
+              <button class="at-btn at-btn-primary at-btn-sm">View Details</button>
+              <button class="at-btn at-btn-outline at-btn-sm">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> {
+  <span class="code-component">Card</span>,
+  <span class="code-component">CardHeader</span>,
+  <span class="code-component">CardTitle</span>,
+  <span class="code-component">CardDescription</span>,
+  <span class="code-component">CardContent</span>,
+  <span class="code-component">CardFooter</span>,
+} <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/card'</span>;
+
+&lt;<span class="code-component">Card</span>>
+  &lt;<span class="code-component">CardHeader</span>>
+    &lt;<span class="code-component">CardTitle</span>>Project Title&lt;/<span class="code-component">CardTitle</span>>
+    &lt;<span class="code-component">CardDescription</span>>Description here.&lt;/<span class="code-component">CardDescription</span>>
+  &lt;/<span class="code-component">CardHeader</span>>
+  &lt;<span class="code-component">CardContent</span>>Content goes here...&lt;/<span class="code-component">CardContent</span>>
+  &lt;<span class="code-component">CardFooter</span>>
+    &lt;<span class="code-component">Button</span>>Action&lt;/<span class="code-component">Button</span>>
+  &lt;/<span class="code-component">CardFooter</span>>
+&lt;/<span class="code-component">Card</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Sub-components</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Component</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>Card</code></td><td>Container chính, chấp nhận <code>className</code> và <code>ref</code></td></tr>
+            <tr><td><code>CardHeader</code></td><td>Phần header với flex column, padding 24px, border-bottom</td></tr>
+            <tr><td><code>CardTitle</code></td><td>Tiêu đề, font-size 18px, font-semibold</td></tr>
+            <tr><td><code>CardDescription</code></td><td>Mô tả phụ, font-size 13px, màu muted</td></tr>
+            <tr><td><code>CardContent</code></td><td>Nội dung chính, padding-top 0</td></tr>
+            <tr><td><code>CardFooter</code></td><td>Footer với flex items-center, padding 24px</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SEPARATOR ========== -->
+  <section id="separator" class="section">
+    <div class="section-title">Separator <span class="tag">Layout</span></div>
+    <div class="section-desc">Đường phân cách ngang hoặc dọc, built trên <code>@radix-ui/react-separator</code>. Đặt tại <code>src/components/ui/separator.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">separator.jsx</span></div>
+      <div class="comp-body">
+        <div class="demo-area" style="flex-direction:column;align-items:flex-start;gap:16px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#374151">Section A</span>
+            <div class="at-separator" style="flex:1"></div>
+            <span style="font-size:13px;color:#374151">Section B</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0">
+            <span style="font-size:13px;color:#374151">Left</span>
+            <div class="at-separator-v"></div>
+            <span style="font-size:13px;color:#374151">Right</span>
+          </div>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> { Separator } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/separator'</span>;
+
+<span class="code-comment">// Horizontal (default)</span>
+&lt;<span class="code-component">Separator</span> /&gt;
+
+<span class="code-comment">// Vertical</span>
+&lt;<span class="code-component">Separator</span> <span class="code-prop">orientation</span>=<span class="code-string">"vertical"</span> /&gt;
+
+<span class="code-comment">// With custom class</span>
+&lt;<span class="code-component">Separator</span> <span class="code-prop">className</span>=<span class="code-string">"my-4"</span> /&gt;</div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Props</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>orientation</code></td><td><span class="type-badge">string</span></td><td><span class="default-badge">horizontal</span></td><td><code>horizontal</code> | <code>vertical</code></td></tr>
+            <tr><td><code>decorative</code></td><td><span class="type-badge">boolean</span></td><td><span class="default-badge">true</span></td><td>Nếu <code>true</code>, separator chỉ mang tính trang trí (không ngăn cách semantic content)</td></tr>
+            <tr><td><code>className</code></td><td><span class="type-badge">string</span></td><td>-</td><td>Custom Tailwind classes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DIALOG ========== -->
+  <section id="dialog" class="section">
+    <div class="section-title">Dialog <span class="tag">Overlay</span></div>
+    <div class="section-desc">Modal/popup built trên <code>@radix-ui/react-dialog</code> với animation và focus trap tự động. Gồm 11 sub-components. Đặt tại <code>src/components/ui/dialog.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">dialog.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">Click button để xem dialog demo.</p>
+        <div class="demo-area">
+          <button class="at-btn at-btn-primary" onclick="showDialogDemo()">Open Dialog</button>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> {
+  <span class="code-component">Dialog</span>,
+  <span class="code-component">DialogTrigger</span>,
+  <span class="code-component">DialogContent</span>,
+  <span class="code-component">DialogHeader</span>,
+  <span class="code-component">DialogFooter</span>,
+  <span class="code-component">DialogTitle</span>,
+  <span class="code-component">DialogDescription</span>,
+  <span class="code-component">DialogClose</span>,
+} <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/dialog'</span>;
+
+&lt;<span class="code-component">Dialog</span>>
+  &lt;<span class="code-component">DialogTrigger</span> <span class="code-prop">asChild</span>>&lt;<span class="code-component">Button</span>>Open Dialog&lt;/<span class="code-component">Button</span>>&lt;/<span class="code-component">DialogTrigger</span>>
+  &lt;<span class="code-component">DialogContent</span>>
+    &lt;<span class="code-component">DialogHeader</span>>
+      &lt;<span class="code-component">DialogTitle</span>>Confirm Action&lt;/<span class="code-component">DialogTitle</span>>
+      &lt;<span class="code-component">DialogDescription</span>>Are you sure you want to proceed?&lt;/<span class="code-component">DialogDescription</span>>
+    &lt;/<span class="code-component">DialogHeader</span>>
+    &lt;<span class="code-component">DialogFooter</span>>
+      &lt;<span class="code-component">DialogClose</span> <span class="code-prop">asChild</span>>&lt;<span class="code-component">Button</span> <span class="code-prop">variant</span>=<span class="code-string">"outline"</span>>Cancel&lt;/<span class="code-component">Button</span>>&lt;/<span class="code-component">DialogClose</span>>
+      &lt;<span class="code-component">Button</span>>Confirm&lt;/<span class="code-component">Button</span>>
+    &lt;/<span class="code-component">DialogFooter</span>>
+  &lt;/<span class="code-component">DialogContent</span>>
+&lt;/<span class="code-component">Dialog</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Sub-components</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Component</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>Dialog</code></td><td>Root provider, quản lý state open/close</td></tr>
+            <tr><td><code>DialogTrigger</code></td><td>Nút/element kích hoạt mở dialog, hỗ trợ <code>asChild</code></td></tr>
+            <tr><td><code>DialogContent</code></td><td>Nội dung dialog, chứa overlay + nút close tự động</td></tr>
+            <tr><td><code>DialogOverlay</code></td><td>Lớp phủ nền (backdrop) mờ</td></tr>
+            <tr><td><code>DialogHeader</code></td><td>Header layout, flex-col, text-center hoặc sm:text-left</td></tr>
+            <tr><td><code>DialogFooter</code></td><td>Footer layout, flex-col-reverse (mobile) hoặc sm:flex-row</td></tr>
+            <tr><td><code>DialogTitle</code></td><td>Tiêu đề dialog</td></tr>
+            <tr><td><code>DialogDescription</code></td><td>Mô tả ngắn bên dưới title</td></tr>
+            <tr><td><code>DialogClose</code></td><td>Nút đóng dialog, hỗ trợ <code>asChild</code></td></tr>
+            <tr><td><code>DialogPortal</code></td><td>Render dialog ra ngoài DOM tree (mặc định trong DialogContent)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DROPDOWN MENU ========== -->
+  <section id="dropdown-menu" class="section">
+    <div class="section-title">DropdownMenu <span class="tag">Overlay</span></div>
+    <div class="section-desc">Menu thả xuống với sub-menu, checkbox, radio, shortcut hints. Built trên <code>@radix-ui/react-dropdown-menu</code>. Gồm 14 sub-components. Đặt tại <code>src/components/ui/dropdown-menu.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">dropdown-menu.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">Click button để xem dropdown demo.</p>
+        <div class="demo-area">
+          <div class="at-dropdown-wrap">
+            <button class="at-btn at-btn-outline" onclick="toggleDropdown(this)">Options</button>
+            <div class="at-dropdown">
+              <div class="at-dropdown-label">Actions</div>
+              <div class="at-dropdown-item">Edit</div>
+              <div class="at-dropdown-item">Duplicate</div>
+              <div class="at-dropdown-sep"></div>
+              <div class="at-dropdown-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> {
+  <span class="code-component">DropdownMenu</span>,
+  <span class="code-component">DropdownMenuTrigger</span>,
+  <span class="code-component">DropdownMenuContent</span>,
+  <span class="code-component">DropdownMenuItem</span>,
+  <span class="code-component">DropdownMenuLabel</span>,
+  <span class="code-component">DropdownMenuSeparator</span>,
+  <span class="code-component">DropdownMenuCheckboxItem</span>,
+  <span class="code-component">DropdownMenuRadioItem</span>,
+} <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/dropdown-menu'</span>;
+
+&lt;<span class="code-component">DropdownMenu</span>>
+  &lt;<span class="code-component">DropdownMenuTrigger</span> <span class="code-prop">asChild</span>>&lt;<span class="code-component">Button</span>>Open&lt;/<span class="code-component">Button</span>>&lt;/<span class="code-component">DropdownMenuTrigger</span>>
+  &lt;<span class="code-component">DropdownMenuContent</span>>
+    &lt;<span class="code-component">DropdownMenuLabel</span>>My Group&lt;/<span class="code-component">DropdownMenuLabel</span>>
+    &lt;<span class="code-component">DropdownMenuItem</span>>Item 1&lt;/<span class="code-component">DropdownMenuItem</span>>
+    &lt;<span class="code-component">DropdownMenuItem</span> <span class="code-prop">inset</span>>Indented Item&lt;/<span class="code-component">DropdownMenuItem</span>>
+    &lt;<span class="code-component">DropdownMenuSeparator</span> />
+    &lt;<span class="code-component">DropdownMenuItem</span> <span class="code-prop">className</span>=<span class="code-string">"text-red-600"</span>>Danger Action&lt;/<span class="code-component">DropdownMenuItem</span>>
+  &lt;/<span class="code-component">DropdownMenuContent</span>>
+&lt;/<span class="code-component">DropdownMenu</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Sub-components</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Component</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>DropdownMenu</code></td><td>Root wrapper</td></tr>
+            <tr><td><code>DropdownMenuTrigger</code></td><td>Nút kích hoạt, hỗ trợ <code>asChild</code></td></tr>
+            <tr><td><code>DropdownMenuContent</code></td><td>Container menu hiển thị</td></tr>
+            <tr><td><code>DropdownMenuItem</code></td><td>Item đơn lẻ, hỗ trợ prop <code>inset</code> để thụt vào</td></tr>
+            <tr><td><code>DropdownMenuCheckboxItem</code></td><td>Checkbox item với check icon tự động</td></tr>
+            <tr><td><code>DropdownMenuRadioItem</code></td><td>Radio item với dot indicator</td></tr>
+            <tr><td><code>DropdownMenuLabel</code></td><td>Tiêu đề nhóm, hỗ trợ <code>inset</code></td></tr>
+            <tr><td><code>DropdownMenuSeparator</code></td><td>Đường phân cách</td></tr>
+            <tr><td><code>DropdownMenuShortcut</code></td><td>Hiển thị phím tắt (e.g. <code>Ctrl+C</code>)</td></tr>
+            <tr><td><code>DropdownMenuSub</code></td><td>Sub-menu container</td></tr>
+            <tr><td><code>DropdownMenuSubTrigger</code></td><td>Trigger mở sub-menu</td></tr>
+            <tr><td><code>DropdownMenuSubContent</code></td><td>Nội dung sub-menu</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SELECT ========== -->
+  <section id="select" class="section">
+    <div class="section-title">Select <span class="tag">Input</span></div>
+    <div class="section-desc">Dropdown chọn option, built trên <code>@radix-ui/react-select</code> với scroll buttons. Gồm 8 sub-components. Đặt tại <code>src/components/ui/select.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">select.jsx</span></div>
+      <div class="comp-body">
+        <div class="demo-area" style="flex-direction:column;align-items:flex-start;gap:14px">
+          <div class="at-select-wrap">
+            <select class="at-select">
+              <option value="">Select an option...</option>
+              <option value="a">Option A</option>
+              <option value="b">Option B</option>
+              <option value="c">Option C</option>
+            </select>
+            <span class="at-select-arrow">&#9660;</span>
+          </div>
+          <div class="at-select-wrap">
+            <select class="at-select" disabled>
+              <option>Disabled Select</option>
+            </select>
+            <span class="at-select-arrow">&#9660;</span>
+          </div>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> {
+  <span class="code-component">Select</span>,
+  <span class="code-component">SelectTrigger</span>,
+  <span class="code-component">SelectValue</span>,
+  <span class="code-component">SelectContent</span>,
+  <span class="code-component">SelectItem</span>,
+  <span class="code-component">SelectLabel</span>,
+  <span class="code-component">SelectGroup</span>,
+  <span class="code-component">SelectSeparator</span>,
+} <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/select'</span>;
+
+&lt;<span class="code-component">Select</span>>
+  &lt;<span class="code-component">SelectTrigger</span>>
+    &lt;<span class="code-component">SelectValue</span> <span class="code-prop">placeholder</span>=<span class="code-string">"Select an option..."</span> />
+  &lt;/<span class="code-component">SelectTrigger</span>>
+  &lt;<span class="code-component">SelectContent</span>>
+    &lt;<span class="code-component">SelectGroup</span>>
+      &lt;<span class="code-component">SelectLabel</span>>Group 1&lt;/<span class="code-component">SelectLabel</span>>
+      &lt;<span class="code-component">SelectItem</span> <span class="code-prop">value</span>=<span class="code-string">"a"</span>>Option A&lt;/<span class="code-component">SelectItem</span>>
+      &lt;<span class="code-component">SelectItem</span> <span class="code-prop">value</span>=<span class="code-string">"b"</span>>Option B&lt;/<span class="code-component">SelectItem</span>>
+    &lt;/<span class="code-component">SelectGroup</span>>
+    &lt;<span class="code-component">SelectSeparator</span> />
+    &lt;<span class="code-component">SelectItem</span> <span class="code-prop">value</span>=<span class="code-string">"c"</span>>Option C&lt;/<span class="code-component">SelectItem</span>>
+  &lt;/<span class="code-component">SelectContent</span>>
+&lt;/<span class="code-component">Select</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Sub-components</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Component</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>Select</code></td><td>Root wrapper, quản lý state</td></tr>
+            <tr><td><code>SelectTrigger</code></td><td>Nút hiển thị giá trị đã chọn, chứa <code>SelectValue</code></td></tr>
+            <tr><td><code>SelectValue</code></td><td>Hiển thị giá trị đã chọn hoặc placeholder</td></tr>
+            <tr><td><code>SelectContent</code></td><td>Panel hiển thị danh sách options</td></tr>
+            <tr><td><code>SelectItem</code></td><td>Mỗi option, có check icon khi selected</td></tr>
+            <tr><td><code>SelectLabel</code></td><td>Label nhóm options</td></tr>
+            <tr><td><code>SelectGroup</code></td><td>Gom nhóm options lại</td></tr>
+            <tr><td><code>SelectSeparator</code></td><td>Đường phân cách giữa các nhóm</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TABLE ========== -->
+  <section id="table" class="section">
+    <div class="section-title">Table <span class="tag">Data</span></div>
+    <div class="section-desc">Bảng dữ liệu với 8 sub-components, hỗ trợ overflow-x scroll. Đặt tại <code>src/components/ui/table.jsx</code>.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Demo</h3><span class="comp-tag">table.jsx</span></div>
+      <div class="comp-body">
+        <p class="comp-desc">8 sub-components cho cấu trúc bảng hoàn chỉnh.</p>
+        <div class="demo-area" style="display:block">
+          <div class="at-table-wrap">
+            <table class="at-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Nguyen Van A</td><td>a.nguyen@example.com</td><td>Admin</td><td><span class="at-badge at-badge-default">Active</span></td></tr>
+                <tr><td>Tran Thi B</td><td>b.tran@example.com</td><td>User</td><td><span class="at-badge at-badge-destructive">Inactive</span></td></tr>
+                <tr><td>Le Van C</td><td>c.le@example.com</td><td>Manager</td><td><span class="at-badge at-badge-secondary">Pending</span></td></tr>
+              </tbody>
+              <tfoot><tr><td colspan="4" style="color:#9ca3af;font-size:12px">3 records total</td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="code-block"><span class="code-keyword">import</span> {
+  <span class="code-component">Table</span>,
+  <span class="code-component">TableHeader</span>,
+  <span class="code-component">TableBody</span>,
+  <span class="code-component">TableRow</span>,
+  <span class="code-component">TableHead</span>,
+  <span class="code-component">TableCell</span>,
+  <span class="code-component">TableCaption</span>,
+} <span class="code-keyword">from</span> <span class="code-string">'@/components/ui/table'</span>;
+
+&lt;<span class="code-component">Table</span>>
+  &lt;<span class="code-component">TableCaption</span>>Your caption here.&lt;/<span class="code-component">TableCaption</span>>
+  &lt;<span class="code-component">TableHeader</span>>
+    &lt;<span class="code-component">TableRow</span>>
+      &lt;<span class="code-component">TableHead</span>>Column 1&lt;/<span class="code-component">TableHead</span>>
+      &lt;<span class="code-component">TableHead</span>>Column 2&lt;/<span class="code-component">TableHead</span>>
+    &lt;/<span class="code-component">TableRow</span>>
+  &lt;/<span class="code-component">TableHeader</span>>
+  &lt;<span class="code-component">TableBody</span>>
+    &lt;<span class="code-component">TableRow</span>>
+      &lt;<span class="code-component">TableCell</span>>Data 1&lt;/<span class="code-component">TableCell</span>>
+      &lt;<span class="code-component">TableCell</span>>Data 2&lt;/<span class="code-component">TableCell</span>>
+    &lt;/<span class="code-component">TableRow</span>>
+  &lt;/<span class="code-component">TableBody</span>>
+&lt;/<span class="code-component">Table</span>></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Sub-components</h3></div>
+      <div class="comp-body" style="padding:0 20px 20px">
+        <table class="props-table">
+          <thead><tr><th>Component</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><code>Table</code></td><td>Wrapper với <code>overflow-auto</code>, chấp nhận <code>className</code></td></tr>
+            <tr><td><code>TableHeader</code></td><td>Bao bọc <code>&lt;thead&gt;</code>, border-bottom cho mỗi row</td></tr>
+            <tr><td><code>TableBody</code></td><td>Bao bọc <code>&lt;tbody&gt;</code></td></tr>
+            <tr><td><code>TableFooter</code></td><td>Bao bọc <code>&lt;tfoot&gt;</code>, background muted</td></tr>
+            <tr><td><code>TableRow</code></td><td>Mỗi dòng, hover effect, selected state</td></tr>
+            <tr><td><code>TableHead</code></td><td>Header cell, font-medium, màu muted, align-middle</td></tr>
+            <tr><td><code>TableCell</code></td><td>Data cell, padding p-4, align-middle</td></tr>
+            <tr><td><code>TableCaption</code></td><td>Chú thích bảng, positioned bên dưới</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DEPS ========== -->
+  <section id="deps" class="section">
+    <div class="section-title">Dependencies <span class="tag">Setup</span></div>
+    <div class="section-desc">Các thư viện cần cài đặt để sử dụng UI components. Chạy lệnh bên dưới trong thư mục project.</div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Core Dependencies</h3></div>
+      <div class="comp-body">
+        <div class="code-block"><span class="code-comment"># Install base dependencies</span>
+npm install class-variance-authority clsx tailwind-merge lucide-react
+
+<span class="code-comment"># Install Radix UI primitives</span>
+npm install @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-separator</div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Utils - lib/utils.js</h3></div>
+      <div class="comp-body">
+        <p class="comp-desc">Hàm <code>cn()</code> (clsx + tailwind-merge) dùng để merge classNames. Đặt tại <code>src/lib/utils.js</code>.</p>
+        <div class="code-block"><span class="code-keyword">import</span> { clsx } <span class="code-keyword">from</span> <span class="code-string">'clsx'</span>;
+<span class="code-keyword">import</span> { twMerge } <span class="code-keyword">from</span> <span class="code-string">'tailwind-merge'</span>;
+
+<span class="code-keyword">export function</span> <span class="code-prop">cn</span>(...inputs) {
+  <span class="code-keyword">return</span> twMerge(clsx(inputs));
+}</div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header"><h3>Index Export - components/ui/index.js</h3></div>
+      <div class="comp-body">
+        <p class="comp-desc">Tạo file index.js export tất cả components để import gọn hơn.</p>
+        <div class="code-block"><span class="code-comment">// src/components/ui/index.js</span>
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./button'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./input'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./textarea'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./label'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./badge'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./card'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./separator'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./dialog'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./dropdown-menu'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./select'</span>;
+<span class="code-keyword">export</span> * <span class="code-keyword">from</span> <span class="code-string">'./table'</span>;</div>
+        <p class="comp-desc" style="margin-top:12px">Sau đó có thể import như:</p>
+        <div class="code-block"><span class="code-keyword">import</span> { Button, Card, Dialog, Table } <span class="code-keyword">from</span> <span class="code-string">'@/components/ui'</span>;</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// Dialog demo
+function showDialogDemo() {
+  const overlay = document.createElement('div');
+  overlay.className = 'at-dialog-overlay';
+  overlay.onclick = function(e) { if(e.target===overlay) document.body.removeChild(overlay); };
+  overlay.innerHTML = `
+    <div class="at-dialog">
+      <button class="at-dialog-close" onclick="this.closest('.at-dialog-overlay').remove()">
+        <span class="at-dialog-x">&times;</span>
+      </button>
+      <div class="at-dialog-header">
+        <div class="at-dialog-title">Confirm Action</div>
+        <div class="at-dialog-desc">Are you sure you want to proceed with this action?</div>
+      </div>
+      <div class="at-dialog-body">
+        This action cannot be undone. Please make sure you have saved all your changes before proceeding.
+      </div>
+      <div class="at-dialog-footer">
+        <button class="at-btn at-btn-outline" onclick="this.closest('.at-dialog-overlay').remove()">Cancel</button>
+        <button class="at-btn at-btn-primary" onclick="this.closest('.at-dialog-overlay').remove()">Confirm</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+// Dropdown demo
+let openDropdown = null;
+function toggleDropdown(btn) {
+  const wrap = btn.closest('.at-dropdown-wrap');
+  const dropdown = wrap.querySelector('.at-dropdown');
+  if (openDropdown && openDropdown !== dropdown) openDropdown.classList.remove('show');
+  dropdown.classList.toggle('show');
+  openDropdown = dropdown.classList.contains('show') ? dropdown : null;
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.at-dropdown-wrap')) {
+    document.querySelectorAll('.at-dropdown.show').forEach(d => d.classList.remove('show'));
+    openDropdown = null;
+  }
+});
+
+// Active nav on scroll
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', function() {
+  let current = '';
+  sections.forEach(sec => {
+    const secTop = sec.offsetTop - 100;
+    if (scrollY >= secTop) current = sec.getAttribute('id');
+  });
+  navItems.forEach(item => {
+    item.classList.remove('active');
+    if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

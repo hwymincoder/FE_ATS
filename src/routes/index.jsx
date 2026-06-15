@@ -1,0 +1,39 @@
+import { Suspense } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
+import { Loading } from '@/components/shared/loading';
+import AuthLayout from '@/layouts/auth-layout';
+import MainLayout from '@/layouts/main-layout';
+import ProtectedRoute from '@/routes/protected-route';
+import { publicRoutes } from '@/routes/public-routes';
+import { privateRoutes } from '@/routes/private-routes';
+
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route element={<AuthLayout />}>
+            {publicRoutes.map((r) => (
+              <Route key={r.path} path={r.path} element={r.element} />
+            ))}
+          </Route>
+
+          <Route
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            {privateRoutes.map((r) => (
+              <Route key={r.path} path={r.path} element={r.element} />
+            ))}
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
