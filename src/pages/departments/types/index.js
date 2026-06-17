@@ -1,14 +1,5 @@
-/**
- * @typedef {Object} Department
- * @property {number} id
- * @property {number|null} parentId
- * @property {string} departmentName
- * @property {string} [description]
- *
- * @typedef {Object} DepartmentPayload
- * @property {string} departmentName
- * @property {string} [description]
- * @property {number|null} [parentId]
- */
+// Re-export toàn bộ JSDoc typedef từ file types chính.
+// Import side-effect: 'import "@/pages/departments/types"' sẽ nạp typedef.
+import './department.types';
 
 export {};
