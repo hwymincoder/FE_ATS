@@ -9,17 +9,21 @@ import {
 import { Button } from '@/components/ui/button';
 
 const InterviewResultDialog = ({ open, onOpenChange, interview, onSave, saving }) => {
-  const [result, setResult] = useState(interview?.result ?? '');
-  const [note, setNote] = useState('');
+  const normalizeResultValue = (value) => (value === 'PENDING' ? '' : value ?? '');
+  const [result, setResult] = useState(normalizeResultValue(interview?.result));
+  const [note, setNote] = useState(interview?.feedback ?? '');
 
   useEffect(() => {
-    setResult(interview?.result ?? '');
-    setNote('');
+    setResult(normalizeResultValue(interview?.result));
+    setNote(interview?.feedback ?? '');
   }, [interview]);
 
   const handleSave = () => {
     if (!interview) return;
-    onSave({ id: interview.id, payload: { result, note, status: 'FINISHED' } });
+    if (!result) {
+      return onOpenChange(false);
+    }
+    onSave({ id: interview.id, payload: { result, feedback: note } });
   };
 
   return (
@@ -39,7 +43,7 @@ const InterviewResultDialog = ({ open, onOpenChange, interview, onSave, saving }
 
             <div className="text-sm text-muted-foreground mt-2">Thời gian</div>
             <div>
-              {interview?.startTime ? new Date(interview.startTime).toLocaleString() : '-'} -{' '}
+              {interview?.scheduledAt || interview?.startTime ? new Date(interview.scheduledAt || interview.startTime).toLocaleString() : '-'} -{' '}
               {interview?.endTime ? new Date(interview.endTime).toLocaleString() : '-'}
             </div>
 
@@ -65,8 +69,12 @@ const InterviewResultDialog = ({ open, onOpenChange, interview, onSave, saving }
               <option value="">Chưa có</option>
               <option value="PASS">Đậu</option>
               <option value="FAIL">Trượt</option>
-              <option value="HOLD">Giữ</option>
             </select>
+            {(interview?.result && interview.result !== 'PENDING') && (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Lưu ý: không thể hoàn nguyên về trạng thái chưa có kết quả sau khi đã lưu.
+              </p>
+            )}
           </div>
 
           <div>

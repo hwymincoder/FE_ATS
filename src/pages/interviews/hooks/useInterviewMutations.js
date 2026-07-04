@@ -9,7 +9,8 @@ export const useUpdateInterviewResult = (options = {}) => {
     mutationFn: ({ id, payload }) => updateInterviewResult(id, payload),
     onSuccess: (data) => {
       toast.success(options.successMessage || 'Cập nhật kết quả phỏng vấn thành công');
-      queryClient.invalidateQueries({ queryKey: INTERVIEW_QUERY_KEYS.lists() });
+
+      queryClient.invalidateQueries({ queryKey: INTERVIEW_QUERY_KEYS.lists(), exact: false });
       options.onSuccess?.(data);
     },
     onError: (err) => {

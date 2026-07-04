@@ -13,8 +13,8 @@ const CalendarPlaceholder = ({ items = [], onItemClick }) => {
           onClick={() => onItemClick(it)}
         >
           <div className="font-medium">{it.candidateName}</div>
-          <div className="text-sm text-muted-foreground">{it.position}</div>
-          <div className="text-sm">{new Date(it.scheduledAt).toLocaleString()}</div>
+          <div className="text-sm text-muted-foreground">{it.jobTitle || it.position}</div>
+          <div className="text-sm">{new Date(it.scheduledAt || it.startTime).toLocaleString()}</div>
         </div>
       ))}
     </div>

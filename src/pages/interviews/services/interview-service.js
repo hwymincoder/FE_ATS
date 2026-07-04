@@ -1,65 +1,121 @@
 import { http } from '@/lib/http';
 import { INTERVIEW_ENDPOINTS } from '@/pages/interviews/constants';
+import { useAuthStore } from '@/stores/auth-store';
 
-// Helper: read mock from localStorage if present (used for dev seeding)
-const readLocalMocks = () => {
+const normalizeInterviewResponse = (item) => ({
+  ...item,
+  scheduledAt: item.scheduledAt || item.startTime,
+  durationMinutes: item.durationMinutes ?? (item.endTime && item.startTime ? Math.max(Math.round((new Date(item.endTime) - new Date(item.startTime)) / 60000), 0) : undefined),
+  jobTitle: item.jobTitle || item.position,
+  feedback: item.feedback ?? item.note ?? item.feedBack,
+});
+
+const parseStoredAuth = () => {
   try {
-    const raw = localStorage.getItem('mock_interviews');
-    if (!raw) return null;
+    const raw = localStorage.getItem('fe-ats-auth');
+    if (!raw) return { token: null, email: null };
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
-    return null;
+    if (!parsed) return { token: null, email: null };
+
+    const token = typeof parsed === 'string'
+      ? parsed
+      : parsed.token ?? parsed.state?.token ?? null;
+    const user = parsed.user ?? parsed.state?.user ?? null;
+    const email = user?.email ?? user?.username ?? null;
+
+    return { token, email };
   } catch {
-    return null;
+    return { token: null, email: null };
   }
 };
 
+const resolveDevEmail = (email) => {
+  if (!email) return null;
+  if (email === 'dev@local') return 'interviewer@ats.local';
+  return email;
+};
+
 export const fetchInterviewList = async (params) => {
-  // prefer local dev mocks if present
-  const local = readLocalMocks();
-  if (local) {
-    // naive filtering by interviewerId/date range
-    let filtered = local;
-    if (params?.interviewerId) {
-      filtered = filtered.filter((i) => String(i.interviewerId) === String(params.interviewerId));
+  const storedAuth = parseStoredAuth();
+  let token = useAuthStore.getState().token || storedAuth.token;
+  const email = useAuthStore.getState().user?.email || storedAuth.email;
+
+  if (!token && import.meta.env.DEV && email) {
+    try {
+      const devToken = await http.get('/api/dev/token', { params: { email: resolveDevEmail(email) } });
+      if (devToken) {
+        token = devToken;
+        try {
+          const raw = localStorage.getItem('fe-ats-auth');
+          const parsed = raw ? JSON.parse(raw) : {};
+          localStorage.setItem('fe-ats-auth', JSON.stringify({
+            ...parsed,
+            state: {
+              ...(parsed?.state ?? {}),
+              token,
+            },
+          }));
+        } catch {}
+      }
+    } catch (e) {
+      // ignore
     }
-    if (params?.dateFrom) {
-      filtered = filtered.filter((i) => new Date(i.startTime) >= new Date(params.dateFrom));
-    }
-    if (params?.dateTo) {
-      filtered = filtered.filter((i) => new Date(i.endTime) <= new Date(params.dateTo));
-    }
-    return { data: filtered, total: filtered.length };
   }
 
   try {
-    const response = await http.get(INTERVIEW_ENDPOINTS.LIST, { params });
+    const config = { params };
+    if (token) config.headers = { Authorization: `Bearer ${token}` };
+    const response = await http.get(INTERVIEW_ENDPOINTS.LIST, config);
     if (Array.isArray(response)) {
-      return { data: response, total: response.length };
+      return { data: response.map(normalizeInterviewResponse), total: response.length };
     }
-    return { data: response?.data ?? [], total: response?.total ?? 0 };
+    return {
+      data: (response?.items ?? response?.data ?? []).map(normalizeInterviewResponse),
+      total: response?.totalItems ?? response?.total ?? 0,
+    };
   } catch (err) {
-    // fallback empty
-    return { data: [], total: 0 };
+    throw err;
   }
 };
 
 export const updateInterviewResult = async (id, payload) => {
-  // if local mocks present, update them in-place for dev
-  const local = readLocalMocks();
-  if (local) {
-    const idx = local.findIndex((i) => String(i.id) === String(id));
-    if (idx >= 0) {
-      local[idx] = { ...local[idx], ...payload };
-      localStorage.setItem('mock_interviews', JSON.stringify(local));
-      return local[idx];
-    }
-  }
+  const body = {
+    result: payload.result,
+    feedback: payload.feedback,
+  };
+
+  const { token: storedToken, email: storedEmail } = parseStoredAuth();
 
   try {
-    return await http.put(INTERVIEW_ENDPOINTS.UPDATE(id), payload);
+    let token = useAuthStore.getState().token || storedToken;
+    const email = useAuthStore.getState().user?.email || storedEmail;
+    if (!token && import.meta.env.DEV && email) {
+      try {
+        const devToken = await http.get('/api/dev/token', { params: { email: resolveDevEmail(email) } });
+        if (devToken) {
+          token = devToken;
+          try {
+            const raw = localStorage.getItem('fe-ats-auth');
+            const parsed = raw ? JSON.parse(raw) : {};
+            localStorage.setItem('fe-ats-auth', JSON.stringify({
+              ...parsed,
+              state: {
+                ...(parsed?.state ?? {}),
+                token,
+              },
+            }));
+          } catch {}
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    const config = {};
+    if (token) config.headers = { Authorization: `Bearer ${token}` };
+    const response = await http.post(INTERVIEW_ENDPOINTS.UPDATE(id), body, config);
+    return normalizeInterviewResponse(response);
   } catch (err) {
-    return { ...payload, id };
+    return normalizeInterviewResponse({ ...payload, id });
   }
 };
 

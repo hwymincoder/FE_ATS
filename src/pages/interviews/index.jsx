@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { PageHeader } from '@/components/shared/page-header';
@@ -8,7 +8,6 @@ import InterviewResultDialog from '@/pages/interviews/components/InterviewResult
 import { useInterviewList } from '@/pages/interviews/hooks/useInterviewQueries';
 import { useUpdateInterviewResult } from '@/pages/interviews/hooks/useInterviewMutations';
 import { DEFAULT_PAGE_SIZE } from '@/pages/interviews/constants';
-import { useAuthStore } from '@/stores/auth-store';
 import CalendarPlaceholder from '@/pages/interviews/components/CalendarPlaceholder';
 
 export default function InterviewsPage() {
@@ -18,42 +17,54 @@ export default function InterviewsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(DEFAULT_PAGE_SIZE);
 
-  // Lọc theo user hiện tại (interviewer)
-  const currentUser = useAuthStore((s) => s.user);
-  const interviewerId = currentUser?.id ?? null;
-
-  // Bộ lọc ngày và view
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'calendar'
+  const [viewMode, setViewMode] = useState('list');
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedInterview, setSelectedInterview] = useState(null);
 
   const params = {
     page: currentPage + 1,
-    pageSize,
-    interviewerId,
-    dateFrom: dateFrom || undefined,
-    dateTo: dateTo || undefined,
+    size: pageSize,
   };
-  const { data, isLoading, isFetching } = useInterviewList(params);
+  const { data, error, isLoading, isFetching } = useInterviewList(params);
   const list = data?.data ?? [];
+  const errorMessage = error
+    ? typeof error === 'string'
+      ? error
+      : error.message || JSON.stringify(error)
+    : null;
+
+  const parseLocalDate = (value) => {
+    if (!value) return null;
+    const trimmed = value.trim();
+    const match = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!match) return null;
+    const [, day, month, year] = match.map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  const filteredList = useMemo(() => {
+    if (!dateFrom && !dateTo) return list;
+
+    const fromDate = parseLocalDate(dateFrom);
+    const toDate = parseLocalDate(dateTo);
+    if (toDate) {
+      toDate.setHours(23, 59, 59, 999);
+    }
+
+    return list.filter((item) => {
+      const scheduled = new Date(item.scheduledAt || item.startTime);
+      if (dateFrom && fromDate && scheduled < fromDate) return false;
+      if (dateTo && toDate && scheduled > toDate) return false;
+      return true;
+    });
+  }, [dateFrom, dateTo, list]);
 
   const updateMutation = useUpdateInterviewResult();
 
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ['interviews'] });
-
-  // seed dev mocks when running in dev mode
-  React.useEffect(() => {
-    if (import.meta.env.DEV) {
-      // dynamic import to avoid including in production bundles
-      import('./dev-seed').then((m) => {
-        m.seedDevInterviews();
-        queryClient.invalidateQueries({ queryKey: ['interviews'] });
-      });
-    }
-  }, []);
 
   const handleOpenUpdate = (item) => {
     setSelectedInterview(item);
@@ -72,15 +83,17 @@ export default function InterviewsPage() {
         <InterviewsActions ref={actionsRef} onRefresh={handleRefresh} />
         <div className="flex items-center gap-2">
           <input
-            type="date"
+            type="text"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
+            placeholder="dd/mm/yyyy"
             className="rounded-md border bg-background px-2 py-1"
           />
           <input
-            type="date"
+            type="text"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
+            placeholder="dd/mm/yyyy"
             className="rounded-md border bg-background px-2 py-1"
           />
           <select
@@ -94,14 +107,18 @@ export default function InterviewsPage() {
         </div>
       </div>
 
-      {viewMode === 'list' ? (
+      {errorMessage ? (
+        <div className="rounded-md border border-red-300 bg-red-50 p-4 text-red-700">
+          <strong>Lỗi API:</strong> {errorMessage}
+        </div>
+      ) : viewMode === 'list' ? (
         <InterviewsDataTable
-          data={list}
+          data={filteredList}
           isLoading={isLoading || isFetching}
           onUpdate={handleOpenUpdate}
         />
       ) : (
-        <CalendarPlaceholder items={list} onItemClick={handleOpenUpdate} />
+        <CalendarPlaceholder items={filteredList} onItemClick={handleOpenUpdate} />
       )}
 
       <InterviewResultDialog

@@ -5,9 +5,8 @@ export const INTERVIEW_QUERY_KEYS = {
 };
 
 export const INTERVIEW_ENDPOINTS = {
-  LIST: '/interviews',
-  DETAIL: (id) => `/interviews/${id}`,
-  UPDATE: (id) => `/interviews/${id}`,
+  LIST: '/api/interviewer/schedules',
+  UPDATE: (id) => `/api/interviewer/schedules/${id}/result`,
 };
 
 export const DEFAULT_PAGE_SIZE = 10;
