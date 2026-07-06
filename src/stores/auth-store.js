@@ -6,16 +6,12 @@ export const useAuthStore = create()(
   persist(
     (set) => ({
       user: null,
-      token: null,
-      refreshToken: null,
-      isAuthenticated: false,
+      accessToken: null,
 
-      setAuth: ({ user, token, refreshToken }) =>
+      setAuth: ({ user, accessToken }) =>
         set({
           user,
-          token,
-          refreshToken,
-          isAuthenticated: !!(user || token),
+          accessToken,
         }),
 
       setUser: (user) => set({ user }),
@@ -23,9 +19,7 @@ export const useAuthStore = create()(
       clearAuth: () =>
         set({
           user: null,
-          token: null,
-          refreshToken: null,
-          isAuthenticated: false,
+          accessToken: null,
         }),
     }),
     {
@@ -33,9 +27,7 @@ export const useAuthStore = create()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
-        refreshToken: state.refreshToken,
-        isAuthenticated: state.isAuthenticated,
+        accessToken: state.accessToken,
       }),
     },
   ),
