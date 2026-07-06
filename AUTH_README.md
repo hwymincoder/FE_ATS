@@ -219,7 +219,6 @@ Khai báo role:
 ```js
 export const ROLES = {
   ADMIN: 'ADMIN',
-  HR: 'HR',
   RECRUITER: 'RECRUITER',
   INTERVIEWER: 'INTERVIEWER',
 };
@@ -227,28 +226,38 @@ export const ROLES = {
 
 Chỉ thêm role thực sự tồn tại ở backend.
 
-Route có thể khai báo:
+Quyền truy cập được khai báo tập trung trong `src/configs/routes.js`:
+
+```js
+export const ROUTE_ACCESS = {
+  DEPARTMENTS: [ROLES.ADMIN],
+  INTERVIEWS: [ROLES.ADMIN, ROLES.INTERVIEWER],
+};
+```
+
+Route sử dụng lại cấu hình này:
 
 ```jsx
 {
   path: '/interviews',
   element: <InterviewsPage />,
-  allowedRoles: [ROLES.ADMIN, ROLES.INTERVIEWER],
+  allowedRoles: ROUTE_ACCESS.INTERVIEWS,
 }
 ```
 
-`RoleRoute` đề xuất:
+`RoleRoute` đã được triển khai tại `src/routes/role-route.jsx`:
 
 ```jsx
 import { Navigate } from 'react-router-dom';
+import { ROUTES } from '@/configs/routes';
 import { useAuth } from '@/hooks/use-auth';
+import { hasAllowedRole } from '@/lib/authorization';
 
 export default function RoleRoute({ allowedRoles, children }) {
   const { user } = useAuth();
 
-  if (!allowedRoles?.length) return children;
-  if (!allowedRoles.includes(user?.role)) {
-    return <Navigate to="/forbidden" replace />;
+  if (!hasAllowedRole(user?.role, allowedRoles)) {
+    return <Navigate to={ROUTES.FORBIDDEN} replace />;
   }
 
   return children;
@@ -262,6 +271,17 @@ export default function RoleRoute({ allowedRoles, children }) {
   {route.element}
 </RoleRoute>
 ```
+
+Quy tắc hiện tại:
+
+| Route | Role được phép |
+|---|---|
+| `/` | Mọi tài khoản đã đăng nhập |
+| `/departments` | `ADMIN` |
+| `/interviews` | `ADMIN`, `INTERVIEWER` |
+| `/forbidden` | Mọi tài khoản đã đăng nhập |
+
+Sidebar dùng cùng `ROUTE_ACCESS` và tự ẩn menu mà người dùng không có quyền truy cập.
 
 Phân quyền frontend chỉ phục vụ điều hướng và trải nghiệm người dùng. Backend vẫn phải kiểm tra quyền cho mọi API và trả `403` khi người dùng không có quyền.
 

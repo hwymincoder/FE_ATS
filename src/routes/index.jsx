@@ -5,6 +5,7 @@ import { Loading } from '@/components/shared/loading';
 import AuthLayout from '@/layouts/auth-layout';
 import MainLayout from '@/layouts/main-layout';
 import ProtectedRoute from '@/routes/protected-route';
+import RoleRoute from '@/routes/role-route';
 import { publicRoutes } from '@/routes/public-routes';
 import { privateRoutes } from '@/routes/private-routes';
 
@@ -27,7 +28,11 @@ export default function AppRouter() {
             }
           >
             {privateRoutes.map((r) => (
-              <Route key={r.path} path={r.path} element={r.element} />
+              <Route
+                key={r.path}
+                path={r.path}
+                element={<RoleRoute allowedRoles={r.allowedRoles}>{r.element}</RoleRoute>}
+              />
             ))}
           </Route>
 

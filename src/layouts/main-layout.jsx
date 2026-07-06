@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useUiStore } from '@/stores/ui-store';
 import { APP_NAME } from '@/constants';
 import { NAV_ITEMS, ROUTES } from '@/configs/routes';
+import { hasAllowedRole } from '@/lib/authorization';
 import { cn } from '@/lib/utils';
 
 const ICONS = {
@@ -26,6 +27,9 @@ export default function MainLayout() {
   const sidebarOpen = useUiStore((s) => s.sidebarOpen);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
+  const visibleNavItems = NAV_ITEMS.filter((item) =>
+    hasAllowedRole(user?.role, item.allowedRoles),
+  );
 
   const handleLogout = () => {
     clearAuth();
@@ -48,7 +52,7 @@ export default function MainLayout() {
         </div>
 
         <nav className="flex-1 space-y-1 p-2">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = ICONS[item.icon] || Building2;
             return (
               <NavLink
