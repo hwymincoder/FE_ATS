@@ -37,15 +37,15 @@ export default function DepartmentPage() {
     () => ({
       ...searchCriteria,
       page: currentPage + 1,
-      pageSize,
+      size: pageSize,
     }),
     [searchCriteria, currentPage, pageSize],
   );
 
   const { data, isLoading, isFetching } = useDepartmentList(requestParams);
-  const list = data?.data ?? [];
+  const list = useMemo(() => data?.data ?? [], [data?.data]);
   const totalItems = data?.total ?? 0;
-  const pageCount = totalItems ? Math.ceil(totalItems / pageSize) : 0;
+  const pageCount = data?.totalPages ?? (totalItems ? Math.ceil(totalItems / pageSize) : 0);
 
   const parentNameMap = useMemo(() => {
     const map = new Map();
