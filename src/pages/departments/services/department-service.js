@@ -1,22 +1,40 @@
 import { http } from '@/lib/http';
 import { DEPARTMENT_ENDPOINTS } from '@/pages/departments/constants';
 
+const buildListParams = (params = {}) => {
+  const pageValue = Number.isInteger(params.page) ? params.page : Number(params.page) || 1;
+  const page = Math.max(pageValue, 1);
+  const sizeValue = params.size ?? params.pageSize;
+  const size = Number.isInteger(sizeValue) ? sizeValue : Number(sizeValue) || 10;
+
+  return {
+    ...(params.keyword ? { keyword: params.keyword } : {}),
+    page,
+    size,
+  };
+};
+
 
 export const fetchDepartmentList = async (params) => {
-  const response = await http.get(DEPARTMENT_ENDPOINTS.LIST, { params });
+  const requestParams = buildListParams(params);
+  const response = await http.get(DEPARTMENT_ENDPOINTS.LIST, { params: requestParams });
   if (Array.isArray(response)) {
     return {
       data: response,
       total: response.length,
-      page: 1,
-      pageSize: response.length,
+      page: requestParams.page,
+      pageSize: requestParams.size,
+      totalPages: response.length ? 1 : 0,
     };
   }
   return {
-    data: response?.data ?? [],
-    total: response?.total ?? 0,
-    page: response?.page ?? 1,
-    pageSize: response?.pageSize ?? params.pageSize,
+    data: response?.items ?? response?.data ?? [],
+    total: response?.totalItems ?? response?.total ?? 0,
+    page: response?.page ?? requestParams.page,
+    pageSize: response?.size ?? response?.pageSize ?? requestParams.size,
+    totalPages: response?.totalPages,
+    hasNext: response?.hasNext,
+    hasPrevious: response?.hasPrevious,
   };
 };
 
@@ -38,8 +56,10 @@ export const deleteDepartment = async (id) => {
 };
 
 export const fetchDepartmentSelection = async () => {
-  const response = await http.get(DEPARTMENT_ENDPOINTS.LIST);
-  return Array.isArray(response) ? response : response?.data ?? [];
+  const response = await http.get(DEPARTMENT_ENDPOINTS.LIST, {
+    params: { page: 1, size: 1000 },
+  });
+  return Array.isArray(response) ? response : response?.items ?? response?.data ?? [];
 };
 
 export const departmentService = {

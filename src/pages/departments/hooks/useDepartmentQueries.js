@@ -7,7 +7,7 @@ import {
 } from '@/pages/departments/services/department-service';
 
 /**
- * @param {{ keyword?: string, page: number, pageSize: number, sortField?: string, sortDirection?: 'asc'|'desc' }} params
+ * @param {{ keyword?: string, page: number, size: number }} params
  */
 export const useDepartmentList = (params) => {
   return useQuery({

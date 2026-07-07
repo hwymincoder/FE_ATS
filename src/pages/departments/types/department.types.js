@@ -16,15 +16,16 @@
  * @typedef {Object} DepartmentPaginationRequest
  * @property {string} [keyword]
  * @property {number} page
- * @property {number} pageSize
- * @property {string} [sortField]
- * @property {'asc'|'desc'} [sortDirection]
+ * @property {number} size
  *
  * @typedef {Object} DepartmentPaginationResponse
  * @property {Department[]} data
  * @property {number} total
  * @property {number} page
  * @property {number} pageSize
+ * @property {number} [totalPages]
+ * @property {boolean} [hasNext]
+ * @property {boolean} [hasPrevious]
  */
 
 export {};

@@ -1,10 +1,10 @@
 
 export const DEPARTMENT_ENDPOINTS = {
-  LIST: '/departments',
-  DETAIL: (id) => `/departments/${id}`,
-  CREATE: '/departments',
-  UPDATE: (id) => `/departments/${id}`,
-  DELETE: (id) => `/departments/${id}`,
+  LIST: '/admin/departments',
+  DETAIL: (id) => `/admin/departments/${id}`,
+  CREATE: '/admin/departments',
+  UPDATE: (id) => `/admin/departments/${id}`,
+  DELETE: (id) => `/admin/departments/${id}`,
 };
 
 /** @type {{ LIST: string }} */
