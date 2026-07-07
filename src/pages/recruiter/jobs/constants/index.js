@@ -11,6 +11,10 @@ export const RECRUITER_DEPARTMENT_ENDPOINTS = {
     LIST: '/api/admin/departments',
 };
 
+export const RECRUITER_LOCATION_ENDPOINTS = {
+    PROVINCES: 'https://provinces.open-api.vn/api/v2/',
+};
+
 export const RECRUITER_JOB_QUERY_KEYS = {
     all: ['recruiter-jobs'],
     lists: () => ['recruiter-jobs', 'list'],
@@ -21,6 +25,10 @@ export const RECRUITER_JOB_QUERY_KEYS = {
 
 export const RECRUITER_DEPARTMENT_QUERY_KEYS = {
     selection: ['recruiter', 'departments', 'selection'],
+};
+
+export const RECRUITER_LOCATION_QUERY_KEYS = {
+    provinces: ['recruiter', 'locations', 'provinces'],
 };
 
 export const DEFAULT_PAGE_SIZE = 10;

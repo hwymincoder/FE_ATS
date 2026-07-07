@@ -23,6 +23,14 @@ const optionalNumber = z.preprocess(
     z.number().optional(),
 );
 
+function getTodayDateValue() {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+
+    return `${now.getFullYear()}-${month}-${day}`;
+}
+
 const jobSchema = z
     .object({
         departmentId: z.coerce.number().min(1, 'Vui lòng nhập phòng ban'),
@@ -31,6 +39,7 @@ const jobSchema = z
         location: z.string().optional().default(''),
         salaryMin: optionalNumber,
         salaryMax: optionalNumber,
+        deadline: z.string().min(1, 'Vui lòng chọn hạn ứng tuyển'),
     })
     .refine(
         (values) => {
@@ -41,6 +50,13 @@ const jobSchema = z
             message: 'Lương tối thiểu phải nhỏ hơn hoặc bằng lương tối đa',
             path: ['salaryMax'],
         },
+    )
+    .refine(
+        (values) => values.deadline >= getTodayDateValue(),
+        {
+            message: 'Hạn ứng tuyển không được ở quá khứ',
+            path: ['deadline'],
+        },
     );
 
 export function JobFormDialog({
@@ -50,12 +66,15 @@ export function JobFormDialog({
     submitting,
     departments = [],
     isLoadingDepartments = false,
+    provinces = [],
+    isLoadingProvinces = false,
     initialData = null,
 }) {
     const {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(jobSchema),
@@ -66,6 +85,7 @@ export function JobFormDialog({
             location: '',
             salaryMin: '',
             salaryMax: '',
+            deadline: '',
         },
     });
 
@@ -78,9 +98,13 @@ export function JobFormDialog({
                 location: initialData?.location ?? '',
                 salaryMin: initialData?.salaryMin ?? '',
                 salaryMax: initialData?.salaryMax ?? '',
+                deadline: initialData?.deadline ?? '',
             });
         }
     }, [initialData, open, reset]);
+
+    const selectedLocation = watch('location');
+    const hasSelectedProvince = provinces.some((province) => province.name === selectedLocation);
 
     const submitForm = (values) => {
         onSubmit({
@@ -104,39 +128,73 @@ export function JobFormDialog({
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(submitForm)} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="title">Tiêu đề *</Label>
-                        <Input id="title" placeholder="VD: Frontend Developer" {...register('title')} />
-                        {errors.title && (
-                            <p className="text-sm text-destructive">{errors.title.message}</p>
-                        )}
-                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="title">Tiêu đề *</Label>
+                            <Input id="title" placeholder="VD: Frontend Developer" {...register('title')} />
+                            {errors.title && (
+                                <p className="text-sm text-destructive">{errors.title.message}</p>
+                            )}
+                        </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="departmentId">Phòng ban *</Label>
-                        <select
-                            id="departmentId"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            disabled={isLoadingDepartments}
-                            {...register('departmentId')}
-                        >
-                            <option value="">
-                                {isLoadingDepartments ? 'Đang tải phòng ban...' : 'Chọn phòng ban'}
-                            </option>
-                            {departments.map((department) => (
-                                <option key={department.id} value={department.id}>
-                                    {department.departmentName || `#${department.id}`}
+                        <div className="space-y-2">
+                            <Label htmlFor="departmentId">Phòng ban *</Label>
+                            <select
+                                id="departmentId"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={isLoadingDepartments}
+                                {...register('departmentId')}
+                            >
+                                <option value="">
+                                    {isLoadingDepartments ? 'Đang tải phòng ban...' : 'Chọn phòng ban'}
                                 </option>
-                            ))}
-                        </select>
-                        {errors.departmentId && (
-                            <p className="text-sm text-destructive">{errors.departmentId.message}</p>
-                        )}
+                                {departments.map((department) => (
+                                    <option key={department.id} value={department.id}>
+                                        {department.departmentName || `#${department.id}`}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.departmentId && (
+                                <p className="text-sm text-destructive">{errors.departmentId.message}</p>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="location">Địa điểm</Label>
-                        <Input id="location" placeholder="VD: Hà Nội" {...register('location')} />
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="location">Địa điểm</Label>
+                            <select
+                                id="location"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={isLoadingProvinces}
+                                {...register('location')}
+                            >
+                                <option value="">
+                                    {isLoadingProvinces ? 'Đang tải tỉnh/thành...' : 'Chọn tỉnh/thành'}
+                                </option>
+                                {selectedLocation && !hasSelectedProvince && (
+                                    <option value={selectedLocation}>{selectedLocation}</option>
+                                )}
+                                {provinces.map((province) => (
+                                    <option key={province.code} value={province.name}>
+                                        {province.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="deadline">Hạn ứng tuyển *</Label>
+                            <Input
+                                id="deadline"
+                                type="date"
+                                min={getTodayDateValue()}
+                                {...register('deadline')}
+                            />
+                            {errors.deadline && (
+                                <p className="text-sm text-destructive">{errors.deadline.message}</p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

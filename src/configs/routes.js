@@ -39,5 +39,12 @@ export const NAV_ITEMS = [
     path: '/recruiter/jobs',
     icon: 'Briefcase',
     allowedRoles: ROUTE_ACCESS.RECRUITER,
+  },
+  {
+    key: 'recruiter-applications',
+    label: 'Applications',
+    path: '/application',
+    icon: 'ClipboardList',
+    allowedRoles: ROUTE_ACCESS.RECRUITER,
   }
 ];

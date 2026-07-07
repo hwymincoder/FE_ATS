@@ -19,6 +19,12 @@ function formatSalary(min, max) {
     return `Đến ${max.toLocaleString()}`;
 }
 
+function formatDeadline(deadline) {
+    if (!deadline) return '—';
+
+    return new Date(`${deadline}T00:00:00`).toLocaleDateString('vi-VN');
+}
+
 function getStatusVariant(status) {
     if (status === 'PUBLISHED') return 'default';
     if (status === 'CLOSED') return 'destructive';
@@ -69,6 +75,7 @@ export function JobDataTable({
                         <TableHead>Phòng ban</TableHead>
                         <TableHead>Địa điểm</TableHead>
                         <TableHead>Lương</TableHead>
+                        <TableHead>Hạn ứng tuyển</TableHead>
                         <TableHead>Trạng thái</TableHead>
                         <TableHead className="w-36 text-right">Hành động</TableHead>
                     </TableRow>
@@ -86,6 +93,7 @@ export function JobDataTable({
                             <TableCell>{getDepartmentName(departments, job.departmentId)}</TableCell>
                             <TableCell>{job.location || '—'}</TableCell>
                             <TableCell>{formatSalary(job.salaryMin, job.salaryMax)}</TableCell>
+                            <TableCell>{formatDeadline(job.deadline)}</TableCell>
                             <TableCell>
                                 <Badge variant={getStatusVariant(job.status)}>{job.status}</Badge>
                             </TableCell>
