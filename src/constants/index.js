@@ -1,8 +1,9 @@
 export const APP_NAME = 'FE_ATS';
 
 export const ROLES = {
-  ADMIN: 'admin',
-  USER: 'user',
+  ADMIN: 'ADMIN',
+  RECRUITER: 'RECRUITER',
+  INTERVIEWER: 'INTERVIEWER',
 };
 
 export const STATUS = {

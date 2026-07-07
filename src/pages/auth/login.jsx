@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,21 +20,31 @@ export default function Login() {
   const { setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [values, setValues] = useState({ username: '', password: '' });
+  const [values, setValues] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
 
-  const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
+  const from = location.state?.from
+    ? `${location.state.from.pathname}${location.state.from.search || ''}`
+    : ROUTES.DASHBOARD;
 
-  const setField = (field) => (e) => {
-    setValues((v) => ({ ...v, [field]: e.target.value }));
+  const setField = (field) => (event) => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      [field]: event.target.value,
+    }));
+
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        [field]: undefined,
+      }));
     }
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (event) => {
+    event.preventDefault();
     const result = loginSchema.safeParse(values);
+
     if (!result.success) {
       const fieldErrors = {};
       for (const issue of result.error.issues) {
@@ -46,14 +56,18 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      const response = await authService.login(result.data);
-      const data = response || {};
+      const data = await authService.login(result.data);
+
+      if (!data?.accessToken || !data?.user) {
+        throw new Error('Phản hồi đăng nhập không hợp lệ');
+      }
+
       setAuth({
-        user: data.user || { username: result.data.username },
-        token: data.token,
-        refreshToken: data.refreshToken,
+        user: data.user,
+        accessToken: data.accessToken,
       });
-      toast.success('Đăng nhập thành công');
+
+      toast.success(data.message || 'Đăng nhập thành công');
       navigate(from, { replace: true });
     } catch (error) {
       toast.error(extractErrorMessage(error, 'Đăng nhập thất bại'));
@@ -71,20 +85,20 @@ export default function Login() {
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4" autoComplete="off">
           <div className="space-y-2">
-            <Label htmlFor="username">Tên đăng nhập</Label>
+            <Label htmlFor="email">Email</Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                id="username"
-                placeholder="Nhập tên đăng nhập"
+                id="email"
+                type="email"
+                placeholder="Nhập email"
                 className="pl-10"
-                value={values.username}
-                onChange={setField('username')}
+                value={values.email}
+                onChange={setField('email')}
+                autoComplete="email"
               />
             </div>
-            {errors.username && (
-              <p className="text-sm text-destructive">{errors.username}</p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
           </div>
 
           <div className="space-y-2">
@@ -98,19 +112,19 @@ export default function Login() {
                 className="px-10"
                 value={values.password}
                 onChange={setField('password')}
+                autoComplete="current-password"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword((v) => !v)}
+                onClick={() => setShowPassword((visible) => !visible)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 tabIndex={-1}
+                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
           </div>
 
           <Button type="submit" className="w-full" disabled={submitting}>
