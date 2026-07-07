@@ -9,6 +9,7 @@ export const ROUTES = {
 export const ROUTE_ACCESS = {
   DEPARTMENTS: [ROLES.ADMIN],
   INTERVIEWS: [ROLES.ADMIN, ROLES.INTERVIEWER],
+  RECRUITER: [ROLES.RECRUITER],
 };
 
 export const NAV_ITEMS = [
@@ -32,4 +33,11 @@ export const NAV_ITEMS = [
     icon: 'Building2',
     allowedRoles: ROUTE_ACCESS.INTERVIEWS,
   },
+  {
+    key: 'recruiter-jobs',
+    label: 'Quản lý job',
+    path: '/recruiter/jobs',
+    icon: 'Briefcase',
+    allowedRoles: ROUTE_ACCESS.RECRUITER,
+  }
 ];
