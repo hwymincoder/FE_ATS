@@ -1,0 +1,223 @@
+import { useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Bell, ChevronDown, LogOut, Menu, User, X } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/use-auth';
+import { useUiStore } from '@/stores/ui-store';
+import { APP_NAME } from '@/constants';
+import { NAV_ITEMS, ROUTES } from '@/configs/routes';
+import { cn } from '@/lib/utils';
+
+const ICONS = {
+  LayoutDashboard: User,
+  Building2: User,
+};
+
+function scrollToId(id) {
+  const el = document.querySelector(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+export default function AppHeader({ navItems = NAV_ITEMS }) {
+  const { user, clearAuth } = useAuth();
+  const toggleSidebar = useUiStore((s) => s.toggleSidebar);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate(ROUTES.LOGIN, { replace: true });
+  };
+
+  const renderNavItem = (item, { isMobile = false, onNavigate } = {}) => {
+    const isAnchor = typeof item.href === 'string' && item.href.startsWith('#');
+
+    if (isAnchor) {
+      const handleClick = (e) => {
+        e.preventDefault();
+        scrollToId(item.href);
+        onNavigate?.();
+      };
+      return (
+        <a
+          key={item.key}
+          href={item.href}
+          onClick={handleClick}
+          className={cn(
+            isMobile
+              ? 'rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent'
+              : cn(
+                  'relative px-4 py-2 text-sm font-medium transition-colors',
+                  'after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:-translate-x-1/2 after:rounded-full after:bg-gradient-to-r after:from-bv-secondary after:to-bv-accent after:transition-all',
+                  'text-muted-foreground hover:text-bv-primary',
+                ),
+          )}
+        >
+          {item.label}
+        </a>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.key}
+        to={item.path}
+        end={item.path === '/'}
+        onClick={() => onNavigate?.()}
+        className={({ isActive }) =>
+          isMobile
+            ? cn(
+                'rounded-md px-3 py-2 text-sm font-medium',
+                isActive ? 'bg-bv-primary text-white' : 'text-muted-foreground hover:bg-accent',
+              )
+            : cn(
+                'relative px-4 py-2 text-sm font-medium transition-colors',
+                'after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:-translate-x-1/2 after:rounded-full after:bg-gradient-to-r after:from-bv-secondary after:to-bv-accent after:transition-all',
+                'hover:text-bv-primary',
+                isActive ? 'text-bv-primary after:w-8' : 'text-muted-foreground',
+              )
+        }
+      >
+        {item.label}
+      </NavLink>
+    );
+  };
+
+  const hasAnchors = navItems.some(
+    (item) => typeof item.href === 'string' && item.href.startsWith('#'),
+  );
+
+  return (
+    <header className="relative">
+      <div className="flex h-16 items-stretch">
+        {/* Logo zone - gradient BVBank with slanted right edge */}
+        <div
+          className="relative flex items-center gap-3 px-5 text-white"
+          style={{
+            background:
+              'linear-gradient(135deg, hsl(var(--bv-primary-deep)) 0%, hsl(var(--bv-primary)) 50%, hsl(var(--bv-secondary)) 100%)',
+            clipPath: 'polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%)',
+            minWidth: '260px',
+          }}
+        >
+          {/* Logo 3 tam giác BVBank */}
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white/15 backdrop-blur-sm">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M12 3 L21 20 L3 20 Z" fill="white" stroke="white" />
+              <path d="M12 9 L17 20 L7 20 Z" fill="hsl(var(--bv-secondary))" stroke="white" />
+              <path d="M12 14 L14 20 L10 20 Z" fill="white" />
+            </svg>
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-bold tracking-wide">{APP_NAME}</span>
+            <span className="text-[10px] uppercase tracking-widest text-white/70">
+              Ngân hàng Bản Việt
+            </span>
+          </div>
+        </div>
+
+        {/* Right zone - white background */}
+        <div className="flex flex-1 items-center justify-between bg-background pl-6 pr-4">
+          {/* Left side: collapse sidebar + nav (desktop) */}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Toggle sidebar">
+              <Menu className="h-5 w-5" />
+            </Button>
+
+            <nav className="ml-4 hidden items-center gap-1 md:flex">
+              {navItems.map((item) => renderNavItem(item))}
+            </nav>
+          </div>
+
+          {/* Right side actions */}
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" aria-label="Thông báo" className="relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-bv-secondary" />
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 px-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-bv-primary text-white">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <span className="hidden text-sm font-medium sm:inline">
+                    {user?.fullName || user?.username || 'User'}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>{user?.email || 'Tài khoản'}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Đăng xuất
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Mobile menu toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Wave SVG dưới header */}
+      <svg
+        className="-mt-px block h-3 w-full"
+        viewBox="0 0 1200 24"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path d="M0,0 L260,0 L288,12 L0,24 Z" fill="hsl(var(--bv-primary))" />
+        <path
+          d="M260,0 L1200,0 L1200,8 C900,18 600,4 288,12 L260,0 Z"
+          fill="hsl(var(--bv-accent-soft))"
+          opacity="0.6"
+        />
+        <path
+          d="M260,0 L1200,0 L1200,4 C900,9 600,2 288,6 L260,0 Z"
+          fill="hsl(var(--bv-accent))"
+          opacity="0.35"
+        />
+      </svg>
+
+      {/* Mobile dropdown menu */}
+      {mobileOpen && (
+        <nav className="absolute left-0 right-0 top-full z-50 border-b bg-background shadow-md md:hidden">
+          <div className="flex flex-col p-2">
+            {navItems.map((item) =>
+              renderNavItem(item, { isMobile: true, onNavigate: () => setMobileOpen(false) }),
+            )}
+          </div>
+        </nav>
+      )}
+    </header>
+  );
+}

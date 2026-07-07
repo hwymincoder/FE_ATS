@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
+  base: '/ats',
   plugins: [react()],
   resolve: {
     alias: {
@@ -16,7 +17,7 @@ export default defineConfig({
   server: {
     port: 3000,
     strictPort: false,
-    open: true,
+    open: '/ats',
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
