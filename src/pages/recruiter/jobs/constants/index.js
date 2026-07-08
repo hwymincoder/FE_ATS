@@ -5,6 +5,7 @@ export const RECRUITER_JOB_ENDPOINTS = {
     UPDATE: (id) => `/api/recruiter/jobs/${id}`,
     DELETE: (id) => `/api/recruiter/jobs/${id}`,
     KANBAN: (id) => `/api/recruiter/jobs/${id}/kanban`,
+    INTERVIEWERS: (id) => `/api/recruiter/jobs/${id}/interviewers`,
 };
 
 export const RECRUITER_DEPARTMENT_ENDPOINTS = {
@@ -21,6 +22,7 @@ export const RECRUITER_JOB_QUERY_KEYS = {
     list: (params) => ['recruiter-jobs', 'list', params],
     detail: (id) => ['recruiter-jobs', 'detail', String(id)],
     kanban: (id) => ['recruiter-jobs', 'kanban', String(id)],
+    interviewers: (id) => ['recruiter-jobs', 'interviewers', String(id)],
 };
 
 export const RECRUITER_DEPARTMENT_QUERY_KEYS = {
