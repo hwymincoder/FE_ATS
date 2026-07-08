@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
 
 const baseURL = import.meta.env.VITE_API_URL || '/api';
+const appBasePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const loginPath = `${appBasePath}/login`;
 
 export const http = axios.create({
   baseURL,
@@ -26,8 +28,8 @@ http.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore.getState().clearAuth();
 
-      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-        window.location.replace('/login');
+      if (typeof window !== 'undefined' && window.location.pathname !== loginPath) {
+        window.location.replace(loginPath);
       }
     }
 
