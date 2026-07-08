@@ -1,4 +1,4 @@
-export const APPLY_ENDPOINT = (jobId) => `/api/jobs/${jobId}/apply`;
+export const APPLY_ENDPOINT = (jobId) => `/jobs/${jobId}/apply`;
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB (khớp BE ApplicationServiceImpl)
 

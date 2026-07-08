@@ -1,5 +1,5 @@
 export const JOB_ENDPOINTS = {
-  POSTED: '/api/recruiter/jobs/getAll',
+  POSTED: '/recruiter/jobs/getAll',
 };
 
 export const JOB_QUERY_KEYS = {
