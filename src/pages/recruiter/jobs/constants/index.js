@@ -1,15 +1,15 @@
 export const RECRUITER_JOB_ENDPOINTS = {
-    LIST: '/api/recruiter/jobs',
-    DETAIL: (id) => `/api/recruiter/jobs/${id}`,
-    CREATE: '/api/recruiter/jobs',
-    UPDATE: (id) => `/api/recruiter/jobs/${id}`,
-    DELETE: (id) => `/api/recruiter/jobs/${id}`,
-    KANBAN: (id) => `/api/recruiter/jobs/${id}/kanban`,
-    INTERVIEWERS: (id) => `/api/recruiter/jobs/${id}/interviewers`,
+    LIST: '/recruiter/jobs',
+    DETAIL: (id) => `/recruiter/jobs/${id}`,
+    CREATE: '/recruiter/jobs',
+    UPDATE: (id) => `/recruiter/jobs/${id}`,
+    DELETE: (id) => `/recruiter/jobs/${id}`,
+    KANBAN: (id) => `/recruiter/jobs/${id}/kanban`,
+    INTERVIEWERS: (id) => `/recruiter/jobs/${id}/interviewers`,
 };
 
 export const RECRUITER_DEPARTMENT_ENDPOINTS = {
-    LIST: '/api/admin/departments',
+    LIST: '/admin/departments',
 };
 
 export const RECRUITER_LOCATION_ENDPOINTS = {
