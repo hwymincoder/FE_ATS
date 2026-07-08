@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CalendarDays, MapPin, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +29,7 @@ function formatSalary(min, max) {
     return `Đến ${max.toLocaleString()}`;
 }
 
-function PublishedJobCard({ job }) {
+function PublishedJobCard({ job, onViewKanban }) {
     return (
         <Card className="flex h-full flex-col">
             <CardHeader className="space-y-3">
@@ -63,7 +64,13 @@ function PublishedJobCard({ job }) {
             </CardContent>
 
             <CardFooter>
-                <Button variant="outline" className="w-full" disabled>
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => onViewKanban(job)}
+                    disabled={!job.id}
+                >
                     Xem Kanban
                 </Button>
             </CardFooter>
@@ -72,6 +79,7 @@ function PublishedJobCard({ job }) {
 }
 
 export default function RecruiterApplicationsPage() {
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -88,6 +96,11 @@ export default function RecruiterApplicationsPage() {
     const handlePageSizeChange = (newSize) => {
         setPageSize(newSize);
         setCurrentPage(0);
+    };
+
+    const handleViewKanban = (job) => {
+        if (!job?.id) return;
+        navigate(`/application/${job.id}/kanban`);
     };
 
     return (
@@ -114,7 +127,7 @@ export default function RecruiterApplicationsPage() {
             {!isLoading && !isFetching && jobs.length > 0 && (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {jobs.map((job) => (
-                        <PublishedJobCard key={job.id} job={job} />
+                        <PublishedJobCard key={job.id} job={job} onViewKanban={handleViewKanban} />
                     ))}
                 </div>
             )}

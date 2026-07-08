@@ -9,6 +9,7 @@ const InterviewsPage = lazy(() => import('@/pages/interviews'));
 const ForbiddenPage = lazy(() => import('@/pages/errors/forbidden'));
 const RecruiterJobsPage = lazy(() => import('@/pages/recruiter/jobs'));
 const RecruiterApplicationsPage = lazy(() => import('@/pages/recruiter/applications'));
+const RecruiterApplicationKanbanPage = lazy(() => import('@/pages/recruiter/applications/kanban'));
 
 export const privateRoutes = [
   {
@@ -37,6 +38,11 @@ export const privateRoutes = [
   {
     path: '/application',
     element: <RecruiterApplicationsPage />,
+    allowedRoles: [ROLES.RECRUITER],
+  },
+  {
+    path: '/application/:jobId/kanban',
+    element: <RecruiterApplicationKanbanPage />,
     allowedRoles: [ROLES.RECRUITER],
   },
 ];

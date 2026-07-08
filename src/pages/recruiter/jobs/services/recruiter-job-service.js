@@ -32,3 +32,9 @@ export function deleteRecruiterJob(id) {
 export function fetchRecruiterJobKanban(id) {
     return http.get(RECRUITER_JOB_ENDPOINTS.KANBAN(id));
 } 
+
+export async function fetchRecruiterJobInterviewers(id) {
+    const response = await http.get(RECRUITER_JOB_ENDPOINTS.INTERVIEWERS(id));
+
+    return Array.isArray(response) ? response : [];
+}
