@@ -5,6 +5,8 @@ import { ROLES } from '@/constants';
 
 const Dashboard = lazy(() => import('@/pages/dashboard'));
 const DepartmentPage = lazy(() => import('@/pages/departments'));
+const PipelineStagesPage = lazy(() => import('@/pages/pipeline-stages'));
+const UsersPage = lazy(() => import('@/pages/users'));
 const InterviewsPage = lazy(() => import('@/pages/interviews'));
 const ForbiddenPage = lazy(() => import('@/pages/errors/forbidden'));
 const RecruiterJobsPage = lazy(() => import('@/pages/recruiter/jobs'));
@@ -20,6 +22,16 @@ export const privateRoutes = [
     path: '/departments',
     element: <DepartmentPage />,
     allowedRoles: ROUTE_ACCESS.DEPARTMENTS,
+  },
+  {
+    path: '/pipeline-stages',
+    element: <PipelineStagesPage />,
+    allowedRoles: ROUTE_ACCESS.PIPELINE_STAGES,
+  },
+  {
+    path: '/users',
+    element: <UsersPage />,
+    allowedRoles: ROUTE_ACCESS.USERS,
   },
   {
     path: '/interviews',
