@@ -4,6 +4,7 @@ export const ROLES = {
   ADMIN: 'ADMIN',
   RECRUITER: 'RECRUITER',
   INTERVIEWER: 'INTERVIEWER',
+  CANDIDATE: 'CANDIDATE',
 };
 
 export const STATUS = {
