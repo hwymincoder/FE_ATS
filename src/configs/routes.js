@@ -9,6 +9,7 @@ export const ROUTES = {
 export const ROUTE_ACCESS = {
   DEPARTMENTS: [ROLES.ADMIN],
   PIPELINE_STAGES: [ROLES.ADMIN],
+  UPGRADE_PACKAGES: [ROLES.ADMIN],
   USERS: [ROLES.ADMIN],
   INTERVIEWS: [ROLES.ADMIN, ROLES.INTERVIEWER],
   RECRUITER: [ROLES.RECRUITER],
@@ -34,6 +35,13 @@ export const NAV_ITEMS = [
     path: '/pipeline-stages',
     icon: 'Building2',
     allowedRoles: ROUTE_ACCESS.PIPELINE_STAGES,
+  },
+  {
+    key: 'upgrade-packages',
+    label: 'Gói nâng cấp',
+    path: '/upgrade-packages',
+    icon: 'Package',
+    allowedRoles: ROUTE_ACCESS.UPGRADE_PACKAGES,
   },
   {
     key: 'users',

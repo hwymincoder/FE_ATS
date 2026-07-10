@@ -1,5 +1,14 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Briefcase, Building2, ClipboardList, LayoutDashboard, LogOut, Menu, User } from 'lucide-react';
+import {
+  Briefcase,
+  Building2,
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  User,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +30,8 @@ const ICONS = {
   LayoutDashboard,
   Building2,
   Briefcase,
-  ClipboardList
+  ClipboardList,
+  Package,
 };
 
 export default function MainLayout() {
