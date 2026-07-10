@@ -8,6 +8,12 @@ export const authService = {
       hashPassword: password,
     });
   },
+  async candidateLogin({ email, password }) {
+    return http.post(API_ENDPOINTS.AUTH.CANDIDATE_LOGIN, {
+      email,
+      hashPassword: password,
+    });
+  },
   async logout() {
     return http.post(API_ENDPOINTS.AUTH.LOGOUT);
   },

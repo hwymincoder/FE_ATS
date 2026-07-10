@@ -2,6 +2,7 @@ import { ROLES } from '@/constants';
 
 export const ROUTES = {
   LOGIN: '/login',
+  CANDIDATE_LOGIN: '/candidate/login',
   DASHBOARD: '/',
   FORBIDDEN: '/forbidden',
 };
