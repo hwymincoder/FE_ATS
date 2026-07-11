@@ -87,8 +87,8 @@ export default function CandidateLogin() {
           <BriefcaseBusiness className="h-6 w-6" />
         </div>
         <div className="space-y-1">
-          <CardTitle className="text-2xl">{APP_NAME} Candidate</CardTitle>
-          <CardDescription>Login to continue your application journey</CardDescription>
+          <CardTitle className="text-2xl">{APP_NAME}</CardTitle>
+          <CardDescription>Đăng nhập ứng viên để ứng tuyển và hỏi AI về job</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
@@ -100,7 +100,7 @@ export default function CandidateLogin() {
               <Input
                 id="candidate-email"
                 type="email"
-                placeholder="Enter email"
+                placeholder="Nhập email"
                 className="pl-10"
                 value={values.email}
                 onChange={setField('email')}
@@ -111,13 +111,13 @@ export default function CandidateLogin() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="candidate-password">Password</Label>
+            <Label htmlFor="candidate-password">Mật khẩu</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="candidate-password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Enter password"
+                placeholder="Nhập mật khẩu"
                 className="px-10"
                 value={values.password}
                 onChange={setField('password')}
@@ -128,7 +128,7 @@ export default function CandidateLogin() {
                 onClick={() => setShowPassword((visible) => !visible)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 tabIndex={-1}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -137,12 +137,12 @@ export default function CandidateLogin() {
           </div>
 
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? 'Logging in...' : 'Login as candidate'}
+            {submitting ? 'Đang đăng nhập...' : 'Đăng nhập ứng viên'}
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
             <Link to={ROUTES.LOGIN} className="font-medium text-primary hover:underline">
-              Staff login
+              Đăng nhập nhân viên
             </Link>
           </div>
         </form>

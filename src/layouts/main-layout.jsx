@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   Briefcase,
@@ -11,6 +12,8 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { LogoutLoadingOverlay } from '@/components/shared/logout-loading-overlay';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,13 +42,20 @@ export default function MainLayout() {
   const sidebarOpen = useUiStore((s) => s.sidebarOpen);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const visibleNavItems = NAV_ITEMS.filter((item) =>
     hasAllowedRole(user?.role, item.allowedRoles),
   );
 
   const handleLogout = () => {
-    clearAuth();
-    navigate(ROUTES.LOGIN, { replace: true });
+    setLogoutDialogOpen(false);
+    setLoggingOut(true);
+    window.setTimeout(() => {
+      setLoggingOut(false);
+      clearAuth();
+      navigate(ROUTES.HOME, { replace: true });
+    }, 1500);
   };
 
   return (
@@ -103,7 +113,10 @@ export default function MainLayout() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>{user?.email || 'Tài khoản'}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+              <DropdownMenuItem
+                onClick={() => setLogoutDialogOpen(true)}
+                className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Đăng xuất
               </DropdownMenuItem>
@@ -115,6 +128,18 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+
+      <ConfirmDialog
+        open={logoutDialogOpen}
+        onOpenChange={setLogoutDialogOpen}
+        title="Đăng xuất tài khoản?"
+        description="Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc hiện tại không?"
+        confirmText="Đăng xuất"
+        cancelText="Ở lại"
+        onConfirm={handleLogout}
+        destructive
+      />
+      <LogoutLoadingOverlay show={loggingOut} />
     </div>
   );
 }

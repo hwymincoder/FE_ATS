@@ -65,3 +65,60 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .loader {
+    --loader-expand: -10px;
+    width: 40px;
+    aspect-ratio: 1;
+    color: #f03355;
+    position: relative;
+    background: radial-gradient(10px, currentColor 94%, #0000);
+  }
+
+  .loader::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(9px at bottom right, #0000 94%, currentColor) top left,
+      radial-gradient(9px at bottom left, #0000 94%, currentColor) top right,
+      radial-gradient(9px at top right, #0000 94%, currentColor) bottom left,
+      radial-gradient(9px at top left, #0000 94%, currentColor) bottom right;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    animation: loader-flower 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
+  }
+
+  .loader-sm {
+    --loader-expand: -4px;
+    width: 18px;
+    background: radial-gradient(4.5px, currentColor 94%, #0000);
+  }
+
+  .loader-sm::before {
+    background-size: 9px 9px;
+    background:
+      radial-gradient(4px at bottom right, #0000 94%, currentColor) top left,
+      radial-gradient(4px at bottom left, #0000 94%, currentColor) top right,
+      radial-gradient(4px at top right, #0000 94%, currentColor) bottom left,
+      radial-gradient(4px at top left, #0000 94%, currentColor) bottom right;
+    background-repeat: no-repeat;
+  }
+}
+
+@keyframes loader-flower {
+  33% {
+    inset: var(--loader-expand);
+    transform: rotate(0deg);
+  }
+  66% {
+    inset: var(--loader-expand);
+    transform: rotate(90deg);
+  }
+  100% {
+    inset: 0;
+    transform: rotate(90deg);
+  }
+}

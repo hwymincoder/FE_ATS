@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
@@ -80,7 +80,7 @@ export default function Login() {
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl">{APP_NAME}</CardTitle>
-        <CardDescription>Đăng nhập để tiếp tục</CardDescription>
+        <CardDescription>Đăng nhập dành cho nhân viên</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4" autoComplete="off">
@@ -128,8 +128,14 @@ export default function Login() {
           </div>
 
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            {submitting ? 'Đang đăng nhập...' : 'Đăng nhập nhân viên'}
           </Button>
+
+          <div className="text-center text-sm text-muted-foreground">
+            <Link to={ROUTES.CANDIDATE_LOGIN} className="font-medium text-primary hover:underline">
+              Đăng nhập ứng viên
+            </Link>
+          </div>
         </form>
       </CardContent>
     </Card>

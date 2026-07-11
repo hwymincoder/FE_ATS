@@ -4,9 +4,10 @@ import { useAuthStore } from '@/stores/auth-store';
 
 const baseURL = import.meta.env.VITE_API_URL || '/api';
 const appBasePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-const loginPath = `${appBasePath}/login`;
+const loginPath = `${appBasePath}/candidate/login`;
+const staffLoginPath = `${appBasePath}/login`;
 const candidateLoginPath = `${appBasePath}/candidate/login`;
-const authPaths = [loginPath, candidateLoginPath];
+const authPaths = [staffLoginPath, candidateLoginPath];
 
 export const http = axios.create({
   baseURL,
