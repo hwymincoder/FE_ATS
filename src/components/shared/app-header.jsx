@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronDown, LogOut, Menu, User, X } from 'lucide-react';
+import { Bell, ChevronDown, LogIn, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { LogoutLoadingOverlay } from '@/components/shared/logout-loading-overlay';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { useUiStore } from '@/stores/ui-store';
-import { APP_NAME } from '@/constants';
+import { APP_NAME, ROLES } from '@/constants';
 import { NAV_ITEMS, ROUTES } from '@/configs/routes';
 import { cn } from '@/lib/utils';
 
@@ -27,16 +30,57 @@ function scrollToId(id) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function getRoleLabel(role) {
+  const labels = {
+    [ROLES.ADMIN]: 'Quản trị viên',
+    [ROLES.RECRUITER]: 'Nhân viên tuyển dụng',
+    [ROLES.INTERVIEWER]: 'Người phỏng vấn',
+    [ROLES.CANDIDATE]: 'Ứng viên',
+  };
+
+  return labels[role] || role || 'Tài khoản';
+}
+
+function getMembershipName(user) {
+  if (user?.role !== ROLES.CANDIDATE) {
+    return getRoleLabel(user?.role);
+  }
+
+  return user?.membershipName || 'Miễn phí';
+}
+
+function AccountInfoRow({ label, value }) {
+  if (value === undefined || value === null || value === '') return null;
+
+  return (
+    <div className="flex items-center justify-between gap-4 text-xs">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="max-w-[150px] truncate font-medium text-foreground">{value}</span>
+    </div>
+  );
+}
+
 export default function AppHeader({ navItems = NAV_ITEMS }) {
   const { user, clearAuth } = useAuth();
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = () => {
-    clearAuth();
-    navigate(ROUTES.LOGIN, { replace: true });
+    setLogoutDialogOpen(false);
+    setLoggingOut(true);
+    window.setTimeout(() => {
+      setLoggingOut(false);
+      clearAuth();
+      navigate(ROUTES.HOME, { replace: true });
+    }, 1500);
+  };
+
+  const openLogoutDialog = () => {
+    setLogoutDialogOpen(true);
   };
 
   const renderNavItem = (item, { isMobile = false, onNavigate } = {}) => {
@@ -136,9 +180,11 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
         <div className="flex flex-1 items-center justify-between bg-background pl-6 pr-4">
           {/* Left side: collapse sidebar + nav (desktop) */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Toggle sidebar">
-              <Menu className="h-5 w-5" />
-            </Button>
+            {!hasAnchors && (
+              <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Toggle sidebar">
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
 
             <nav className="ml-4 hidden items-center gap-1 md:flex">
               {navItems.map((item) => renderNavItem(item))}
@@ -147,32 +193,79 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
 
           {/* Right side actions */}
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" aria-label="Thông báo" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-bv-secondary" />
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 px-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-bv-primary text-white">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <span className="hidden text-sm font-medium sm:inline">
-                    {user?.fullName || user?.username || 'User'}
-                  </span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            {user ? (
+              <>
+                <Button variant="ghost" size="icon" aria-label="Thông báo" className="relative">
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-bv-secondary" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{user?.email || 'Tài khoản'}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Đăng xuất
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2 px-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-bv-primary text-white">
+                        <User className="h-4 w-4" />
+                      </div>
+                      <span className="hidden text-sm font-medium sm:inline">
+                        {user.fullName || user.username || 'User'}
+                      </span>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-72 p-0">
+                    <DropdownMenuLabel className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bv-primary text-white">
+                          <User className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-semibold">
+                            {user.fullName || user.username || 'Tài khoản'}
+                          </div>
+                          <div className="truncate text-xs font-normal text-muted-foreground">
+                            {user.username || 'Chưa có email'}
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <Badge variant="secondary" className="gap-1">
+                              <Sparkles className="h-3 w-3" />
+                              {getMembershipName(user)}
+                            </Badge>
+                            <Badge variant="outline">{getRoleLabel(user.role)}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
+                    <div className="space-y-2 border-t px-4 py-3">
+                      <AccountInfoRow label="Email" value={user.username} />
+                      <AccountInfoRow
+                        label="Lượt hỏi AI"
+                        value={
+                          user.numberOfQueryQuota !== undefined && user.numberOfQueryQuota !== null
+                            ? `${user.numberOfQueryQuota} lượt`
+                            : null
+                        }
+                      />
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={openLogoutDialog}
+                      className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Đăng xuất
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button
+                className="gap-2"
+                onClick={() => navigate(ROUTES.CANDIDATE_LOGIN)}
+              >
+                <LogIn className="h-4 w-4" />
+                Đăng nhập
+              </Button>
+            )}
 
             {/* Mobile menu toggle */}
             <Button
@@ -218,6 +311,18 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
           </div>
         </nav>
       )}
+
+      <ConfirmDialog
+        open={logoutDialogOpen}
+        onOpenChange={setLogoutDialogOpen}
+        title="Đăng xuất tài khoản?"
+        description="Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc hiện tại không?"
+        confirmText="Đăng xuất"
+        cancelText="Ở lại"
+        onConfirm={handleLogout}
+        destructive
+      />
+      <LogoutLoadingOverlay show={loggingOut} />
     </header>
   );
 }

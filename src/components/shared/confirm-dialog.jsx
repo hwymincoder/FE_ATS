@@ -35,6 +35,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={loading}
           >
+            {loading && <span className="loader loader-sm text-current" aria-hidden="true" />}
             {confirmText}
           </Button>
         </DialogFooter>

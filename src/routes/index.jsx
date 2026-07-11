@@ -10,6 +10,7 @@ import ProtectedRoute from '@/routes/protected-route';
 import RoleRoute from '@/routes/role-route';
 import { publicRoutes } from '@/routes/public-routes';
 import { privateRoutes } from '@/routes/private-routes';
+import { ROUTES } from '@/configs/routes';
 
 const HomePage = lazy(() => import('@/pages/homes/home'));
 const JobsPage = lazy(() => import('@/pages/homes/jobs'));
@@ -23,10 +24,16 @@ export default function AppRouter() {
             {publicRoutes.map((r) => (
               <Route key={r.path} path={r.path} element={r.element} />
             ))}
-            <Route path="/home" element={<HomeLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="jobs" element={<JobsPage />} />
-            </Route>
+          </Route>
+
+          <Route path={ROUTES.HOME} element={<HomeLayout />}>
+            <Route index element={<HomePage />} />
+          </Route>
+
+          <Route path="/home" element={<Navigate to={ROUTES.HOME} replace />} />
+
+          <Route path="/home/jobs" element={<HomeLayout />}>
+            <Route index element={<JobsPage />} />
           </Route>
 
           <Route
