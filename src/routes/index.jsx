@@ -5,6 +5,7 @@ import { Loading } from '@/components/shared/loading';
 import AuthLayout from '@/layouts/auth-layout';
 import HomeLayout from '@/layouts/home-layout';
 import MainLayout from '@/layouts/main-layout';
+import CandidateChatGate from '@/pages/candidate/chatbot/CandidateChatGate';
 import ProtectedRoute from '@/routes/protected-route';
 import RoleRoute from '@/routes/role-route';
 import { publicRoutes } from '@/routes/public-routes';
@@ -47,6 +48,8 @@ export default function AppRouter() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+
+      <CandidateChatGate />
     </BrowserRouter>
   );
 }

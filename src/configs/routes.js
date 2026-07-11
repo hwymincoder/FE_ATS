@@ -3,6 +3,7 @@ import { ROLES } from '@/constants';
 export const ROUTES = {
   LOGIN: '/login',
   CANDIDATE_LOGIN: '/candidate/login',
+  HOME: '/home',
   DASHBOARD: '/',
   FORBIDDEN: '/forbidden',
 };
@@ -71,5 +72,5 @@ export const NAV_ITEMS = [
     path: '/application',
     icon: 'ClipboardList',
     allowedRoles: ROUTE_ACCESS.RECRUITER,
-  }
+  },
 ];

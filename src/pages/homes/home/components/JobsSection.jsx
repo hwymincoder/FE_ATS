@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Building2, MapPin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, MapPin, MessageSquare } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -6,6 +6,10 @@ import { Loading } from '@/components/shared/loading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ROUTES } from '@/configs/routes';
+import { ROLES } from '@/constants';
+import { useAuth } from '@/hooks/use-auth';
+import { useChatbotStore } from '@/stores/chatbot-store';
 import { JOB_DEFAULTS } from '@/pages/homes/home/constants';
 import { usePostedJobs } from '@/pages/homes/home/services/job-queries';
 import { cn } from '@/lib/utils';
@@ -120,6 +124,29 @@ function LocationsGrid({ jobs, isLoading, isError }) {
 }
 
 function JobsGrid({ jobs, isLoading, isError, onApply }) {
+  const navigate = useNavigate();
+  const { user, accessToken } = useAuth();
+  const openChat = useChatbotStore((s) => s.openChat);
+
+  const handleAskAi = (job) => {
+    const chatContext = {
+      jobId: job.id,
+      jobTitle: job.title || `Job #${job.id}`,
+    };
+
+    if (user?.role === ROLES.CANDIDATE && accessToken) {
+      openChat(chatContext);
+      return;
+    }
+
+    navigate(ROUTES.CANDIDATE_LOGIN, {
+      state: {
+        chatContext,
+        from: ROUTES.HOME,
+      },
+    });
+  };
+
   if (isLoading) {
     return <Loading text="Đang tải vị trí..." />;
   }
@@ -173,14 +200,24 @@ function JobsGrid({ jobs, isLoading, isError, onApply }) {
                   </div>
                 )}
               </div>
-              <Button
-                className="mt-5 w-full gap-2 transition-colors hover:bg-bv-primary hover:text-white hover:border-bv-primary"
-                variant="outline"
-                onClick={() => onApply?.(job)}
-              >
-                Ứng tuyển
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              <div className="mt-5 space-y-2">
+                <Button
+                  className="w-full gap-2 transition-colors hover:bg-bv-primary hover:text-white hover:border-bv-primary"
+                  variant="outline"
+                  onClick={() => onApply?.(job)}
+                >
+                  Ứng tuyển
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  className="w-full gap-2"
+                  variant="secondary"
+                  onClick={() => handleAskAi(job)}
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Hỏi AI
+                </Button>
+              </div>
             </CardContent>
           </Card>
         );
