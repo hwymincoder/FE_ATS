@@ -26,6 +26,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { extractErrorMessage } from '@/lib/extract-error';
 import { cn } from '@/lib/utils';
 import {
+    APPLICATION_PRIORITY,
+    getApplicationPriorityBadgeVariant,
+    getApplicationPriorityDisplayLabel,
+    getApplicationPriorityLabel,
+} from '@/pages/recruiter/applications/constants';
+import {
     useCreateRecruiterApplicationInterview,
     useMoveRecruiterApplicationStage,
     useUpdateRecruiterApplicationInterview,
@@ -156,6 +162,9 @@ function ApplicationCard({
 }) {
     const stageOptions = getStageOptions(stages, currentStage);
     const isInterviewStage = normalizeStageName(currentStage.stageName) === 'INTERVIEW';
+    const priorityLabel = getApplicationPriorityLabel(application.priority);
+    const priorityVariant = getApplicationPriorityBadgeVariant(application.priority);
+    const normalizedPriority = Number(application.priority ?? 0);
 
     return (
         <Card
@@ -173,6 +182,8 @@ function ApplicationCard({
             onDragEnd={() => onDragStart(null, null)}
             className={cn(
                 'rounded-md border bg-background shadow-sm outline-none transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                normalizedPriority >= APPLICATION_PRIORITY.PREMIUM && 'border-2 border-amber-500',
+                normalizedPriority === APPLICATION_PRIORITY.PRO && 'border-2 border-sky-500',
                 moving && 'cursor-wait opacity-60',
                 !moving && 'cursor-grab active:cursor-grabbing',
             )}
@@ -182,11 +193,16 @@ function ApplicationCard({
                     <CardTitle className="line-clamp-2 text-base leading-6">
                         {application.candidateName || 'Ứng viên chưa có tên'}
                     </CardTitle>
-                    {application.interviewResult && (
-                        <Badge variant={getInterviewBadgeVariant(application.interviewResult)}>
-                            {application.interviewResult}
-                        </Badge>
-                    )}
+                    <div className="flex flex-wrap items-start justify-end gap-2">
+                        {priorityLabel && (
+                            <Badge variant={priorityVariant}>{priorityLabel}</Badge>
+                        )}
+                        {application.interviewResult && (
+                            <Badge variant={getInterviewBadgeVariant(application.interviewResult)}>
+                                {application.interviewResult}
+                            </Badge>
+                        )}
+                    </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <UserRound className="h-4 w-4" />
@@ -701,6 +717,18 @@ export default function RecruiterApplicationKanbanPage() {
                                 <DetailRow label="Email" value={applicationDetail.candidate?.email} />
                                 <DetailRow label="Số điện thoại" value={applicationDetail.candidate?.phone} />
                                 <DetailRow label="Ngày ứng tuyển" value={formatDateTime(applicationDetail.appliedAt)} />
+                                <div className="space-y-1">
+                                    <div className="text-xs font-medium uppercase text-muted-foreground">
+                                        Mức ưu tiên
+                                    </div>
+                                    {getApplicationPriorityLabel(applicationDetail.priority) ? (
+                                        <Badge variant={getApplicationPriorityBadgeVariant(applicationDetail.priority)}>
+                                            {getApplicationPriorityDisplayLabel(applicationDetail.priority)}
+                                        </Badge>
+                                    ) : (
+                                        <div className="text-sm">Thường</div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2">

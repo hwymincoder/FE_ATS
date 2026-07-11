@@ -13,6 +13,7 @@ import { loginSchema } from '@/schemas/login-schema';
 import { ROUTES } from '@/configs/routes';
 import { APP_NAME } from '@/constants';
 import { extractErrorMessage } from '@/lib/extract-error';
+import { useChatbotStore } from '@/stores/chatbot-store';
 
 export default function CandidateLogin() {
   const navigate = useNavigate();
@@ -23,9 +24,8 @@ export default function CandidateLogin() {
   const [values, setValues] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
 
-  const from = location.state?.from
-    ? `${location.state.from.pathname}${location.state.from.search || ''}`
-    : ROUTES.DASHBOARD;
+  const chatContext = location.state?.chatContext;
+  const from = location.state?.from || ROUTES.HOME;
 
   const setField = (field) => (event) => {
     setValues((currentValues) => ({
@@ -66,6 +66,10 @@ export default function CandidateLogin() {
         user: data.user,
         accessToken: data.accessToken,
       });
+
+      if (chatContext) {
+        useChatbotStore.getState().openChat(chatContext);
+      }
 
       toast.success(data.message || 'Login successful');
       navigate(from, { replace: true });

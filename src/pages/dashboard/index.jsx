@@ -1,3 +1,5 @@
+import { Navigate } from 'react-router-dom';
+
 import { ROLES } from '@/constants';
 import { useAuth } from '@/hooks/use-auth';
 import RecruiterDashboard from '@/pages/recruiter/dashboard';
