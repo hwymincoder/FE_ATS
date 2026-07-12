@@ -49,6 +49,20 @@ function getMembershipName(user) {
   return user?.membershipName || 'Miễn phí';
 }
 
+function getMembershipBadgeClass(membershipName) {
+  const normalizedName = membershipName?.trim().toUpperCase();
+
+  if (normalizedName === 'PRO') {
+    return 'border-slate-300 bg-gradient-to-r from-slate-100 via-white to-slate-200 text-slate-700 shadow-sm';
+  }
+
+  if (normalizedName === 'PREMIUM') {
+    return 'border-violet-300 bg-gradient-to-r from-slate-200 via-violet-100 to-slate-300 text-violet-900 shadow-sm ring-1 ring-violet-200/70';
+  }
+
+  return '';
+}
+
 function AccountInfoRow({ label, value }) {
   if (value === undefined || value === null || value === '') return null;
 
@@ -142,11 +156,14 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
   );
 
   return (
-    <header className="relative">
+    <header className="sticky top-0 z-50 bg-background shadow-sm">
       <div className="flex h-16 items-stretch">
         {/* Logo zone - gradient BVBank with slanted right edge */}
-        <div
-          className="relative flex items-center gap-3 px-5 text-white"
+        <button
+          type="button"
+          onClick={() => navigate(ROUTES.HOME)}
+          aria-label="Về trang chủ"
+          className="relative flex cursor-pointer items-center gap-3 border-0 px-5 text-left text-white transition-[filter] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
           style={{
             background:
               'linear-gradient(135deg, hsl(var(--bv-primary-deep)) 0%, hsl(var(--bv-primary)) 50%, hsl(var(--bv-secondary)) 100%)',
@@ -171,10 +188,10 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-bold tracking-wide">{APP_NAME}</span>
             <span className="text-[10px] uppercase tracking-widest text-white/70">
-              Ngân hàng Bản Việt
+              ATS
             </span>
           </div>
-        </div>
+        </button>
 
         {/* Right zone - white background */}
         <div className="flex flex-1 items-center justify-between bg-background pl-6 pr-4">
@@ -226,7 +243,10 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
                             {user.username || 'Chưa có email'}
                           </div>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <Badge variant="secondary" className="gap-1">
+                            <Badge
+                              variant="secondary"
+                              className={cn('gap-1', getMembershipBadgeClass(user.membershipName))}
+                            >
                               <Sparkles className="h-3 w-3" />
                               {getMembershipName(user)}
                             </Badge>
@@ -247,6 +267,18 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
                       />
                     </div>
                     <DropdownMenuSeparator />
+                    {user.role === ROLES.CANDIDATE && (
+                      <>
+                        <DropdownMenuItem
+                          onSelect={() => navigate(ROUTES.CANDIDATE_UPGRADE)}
+                          className="cursor-pointer px-4 py-3 text-bv-primary focus:bg-bv-primary/10 focus:text-bv-primary"
+                        >
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Nâng cấp tài khoản
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
                     <DropdownMenuItem
                       onClick={openLogoutDialog}
                       className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive"

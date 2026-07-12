@@ -5,6 +5,8 @@ export const ROUTES = {
   CANDIDATE_LOGIN: '/candidate/login',
   HOME: '/',
   DASHBOARD: '/dashboard',
+  CANDIDATE_UPGRADE: '/candidate/upgrade',
+  CANDIDATE_CHECKOUT: '/candidate/checkout/:packageId',
   FORBIDDEN: '/forbidden',
 };
 
@@ -15,6 +17,7 @@ export const ROUTE_ACCESS = {
   USERS: [ROLES.ADMIN],
   INTERVIEWS: [ROLES.ADMIN, ROLES.INTERVIEWER],
   RECRUITER: [ROLES.RECRUITER],
+  CANDIDATE: [ROLES.CANDIDATE],
 };
 
 export const NAV_ITEMS = [

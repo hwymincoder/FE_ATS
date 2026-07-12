@@ -10,3 +10,11 @@ export function usePostedJobs(params) {
     staleTime: 60_000,
   });
 }
+
+export function useAllPostedJobs() {
+  return useQuery({
+    queryKey: JOB_QUERY_KEYS.all,
+    queryFn: () => jobService.getAllPostedJobs(),
+    staleTime: 60_000,
+  });
+}

@@ -8,6 +8,7 @@ import {
   LogOut,
   Menu,
   Package,
+  Sparkles,
   User,
 } from 'lucide-react';
 
@@ -24,7 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { useUiStore } from '@/stores/ui-store';
-import { APP_NAME } from '@/constants';
+import { APP_NAME, ROLES } from '@/constants';
 import { NAV_ITEMS, ROUTES } from '@/configs/routes';
 import { hasAllowedRole } from '@/lib/authorization';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,20 @@ const ICONS = {
   ClipboardList,
   Package,
 };
+
+function getMembershipClass(membershipName) {
+  const normalizedName = membershipName?.trim().toUpperCase();
+
+  if (normalizedName === 'PRO') {
+    return 'border border-slate-300 bg-gradient-to-r from-slate-100 via-white to-slate-200 text-slate-700 shadow-sm';
+  }
+
+  if (normalizedName === 'PREMIUM') {
+    return 'border border-violet-300 bg-gradient-to-r from-slate-200 via-violet-100 to-slate-300 text-violet-900 shadow-sm ring-1 ring-violet-200/70';
+  }
+
+  return 'bg-primary/10 text-primary';
+}
 
 export default function MainLayout() {
   const { user, clearAuth } = useAuth();
@@ -110,9 +125,41 @@ export default function MainLayout() {
                 <span className="hidden sm:inline">{user?.fullName || user?.username || 'User'}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>{user?.email || 'Tài khoản'}</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuLabel className="space-y-1">
+                <div>{user?.fullName || user?.username || 'Tài khoản'}</div>
+                <div className="truncate text-xs font-normal text-muted-foreground">
+                  {user?.username}
+                </div>
+                {user?.role === ROLES.CANDIDATE && (
+                  <div className="flex items-center justify-between pt-2 text-xs font-normal">
+                    <span
+                      className={cn(
+                        'rounded-full px-2 py-1 font-medium',
+                        getMembershipClass(user?.membershipName),
+                      )}
+                    >
+                      {user?.membershipName || 'Miễn phí'}
+                    </span>
+                    <span className="text-muted-foreground">
+                      Lượt hỏi AI: {user?.numberOfQueryQuota ?? 0}
+                    </span>
+                  </div>
+                )}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {user?.role === ROLES.CANDIDATE && (
+                <>
+                  <DropdownMenuItem
+                    onClick={() => navigate(ROUTES.CANDIDATE_UPGRADE)}
+                    className="cursor-pointer"
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Nâng cấp tài khoản
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem
                 onClick={() => setLogoutDialogOpen(true)}
                 className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive"

@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight, Building2, MapPin, MessageSquare } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { ArrowRight, Building2, MapPin, MessageSquare } from 'lucide-react';
+import { useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { Loading } from '@/components/shared/loading';
@@ -10,8 +10,7 @@ import { ROUTES } from '@/configs/routes';
 import { ROLES } from '@/constants';
 import { useAuth } from '@/hooks/use-auth';
 import { useChatbotStore } from '@/stores/chatbot-store';
-import { JOB_DEFAULTS } from '@/pages/homes/home/constants';
-import { usePostedJobs } from '@/pages/homes/home/services/job-queries';
+import { useAllPostedJobs } from '@/pages/homes/home/services/job-queries';
 import { cn } from '@/lib/utils';
 import SectionTitle from './SectionTitle';
 
@@ -227,24 +226,15 @@ function JobsGrid({ jobs, isLoading, isError, onApply }) {
 }
 
 export default function JobsSection({ mode = 'locations', onApply }) {
-  const [page, setPage] = useState(JOB_DEFAULTS.page);
   const [searchParams] = useSearchParams();
   const locationFilter = useMemo(() => {
     const raw = searchParams.get('location');
     return raw && raw.trim() ? raw.trim() : null;
   }, [searchParams]);
 
-  const { data, isLoading, isError } = usePostedJobs({
-    page,
-    size: JOB_DEFAULTS.size,
-  });
+  const { data, isLoading, isError } = useAllPostedJobs();
 
-  const allJobs = data?.items ?? [];
-  const totalPages = data?.totalPages ?? 1;
-  const currentPage = data?.page ?? page;
-  const canPrev = data?.hasPrevious ?? currentPage > 1;
-  const canNext = data?.hasNext ?? currentPage < totalPages;
-
+  const allJobs = Array.isArray(data) ? data : [];
   const filteredJobs = useMemo(() => {
     if (mode !== 'jobs' || !locationFilter) return allJobs;
     return allJobs.filter((job) => {
@@ -252,13 +242,6 @@ export default function JobsSection({ mode = 'locations', onApply }) {
       return jobLoc === locationFilter;
     });
   }, [allJobs, mode, locationFilter]);
-
-  const goPrev = () => {
-    if (canPrev) setPage((p) => Math.max(1, p - 1));
-  };
-  const goNext = () => {
-    if (canNext) setPage((p) => p + 1);
-  };
 
   if (mode === 'locations') {
     return (
@@ -293,34 +276,6 @@ export default function JobsSection({ mode = 'locations', onApply }) {
         />
 
         <JobsGrid jobs={filteredJobs} isLoading={isLoading} isError={isError} onApply={onApply} />
-
-        {filteredJobs.length > 0 && totalPages > 1 && (
-          <nav
-            aria-label="Phân trang danh sách vị trí"
-            className="mt-10 flex items-center justify-center gap-2"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={goPrev}
-              disabled={!canPrev || isLoading}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Trước
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={goNext}
-              disabled={!canNext || isLoading}
-              className="gap-2"
-            >
-              Sau
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </nav>
-        )}
       </div>
     </section>
   );
