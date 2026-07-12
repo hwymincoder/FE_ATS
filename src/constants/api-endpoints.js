@@ -7,6 +7,7 @@ export const API_ENDPOINTS = {
   },
   CANDIDATE: {
     CREATE: 'candidate',
+    UPDATE: (id) => `candidate/${id}`,
   },
   // Endpoints từng trang nằm trong src/pages/<name>/constants
 };

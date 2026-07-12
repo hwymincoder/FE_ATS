@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronDown, LogIn, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Bell, ChevronDown, KeyRound, LogIn, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,11 +19,6 @@ import { useUiStore } from '@/stores/ui-store';
 import { APP_NAME, ROLES } from '@/constants';
 import { NAV_ITEMS, ROUTES } from '@/configs/routes';
 import { cn } from '@/lib/utils';
-
-const ICONS = {
-  LayoutDashboard: User,
-  Building2: User,
-};
 
 function scrollToId(id) {
   const el = document.querySelector(id);
@@ -78,7 +73,6 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
   const { user, clearAuth } = useAuth();
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -269,6 +263,13 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
                     <DropdownMenuSeparator />
                     {user.role === ROLES.CANDIDATE && (
                       <>
+                        <DropdownMenuItem
+                          onSelect={() => navigate(ROUTES.CANDIDATE_CHANGE_PASSWORD)}
+                          className="cursor-pointer px-4 py-3"
+                        >
+                          <KeyRound className="mr-2 h-4 w-4" />
+                          Đổi mật khẩu
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={() => navigate(ROUTES.CANDIDATE_UPGRADE)}
                           className="cursor-pointer px-4 py-3 text-bv-primary focus:bg-bv-primary/10 focus:text-bv-primary"

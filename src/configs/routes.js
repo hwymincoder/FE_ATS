@@ -7,6 +7,7 @@ export const ROUTES = {
   HOME: '/',
   DASHBOARD: '/dashboard',
   CANDIDATE_UPGRADE: '/candidate/upgrade',
+  CANDIDATE_CHANGE_PASSWORD: '/candidate/change-password',
   CANDIDATE_CHECKOUT: '/candidate/checkout/:packageId',
   FORBIDDEN: '/forbidden',
 };
