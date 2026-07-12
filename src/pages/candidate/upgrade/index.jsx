@@ -70,9 +70,13 @@ export default function CandidateUpgradePage() {
     };
   }, []);
 
-  const membershipIsActive = user?.membershipExpiresAt
-    ? new Date(user.membershipExpiresAt).getTime() > Date.now()
-    : false;
+  const hasPaidMembership = Boolean(
+    user?.membershipName && user.membershipName.trim().toUpperCase() !== 'FREE',
+  );
+  const membershipIsActive = hasPaidMembership && (
+    !user?.membershipExpiresAt
+    || new Date(user.membershipExpiresAt).getTime() > Date.now()
+  );
 
   const isLocked = (item) =>
     membershipIsActive && Number(item.priority ?? 0) <= Number(user?.membershipPriority ?? 0);
@@ -116,9 +120,11 @@ export default function CandidateUpgradePage() {
               {user?.membershipName || 'Miễn phí'}
             </div>
             <div className="mt-2 text-sm text-blue-100">
-              {membershipIsActive
+              {membershipIsActive && user?.membershipExpiresAt
                 ? `Có hiệu lực đến ${dateFormatter.format(new Date(user.membershipExpiresAt))}`
-                : 'Chưa có gói trả phí đang hoạt động'}
+                : membershipIsActive
+                  ? 'Đang hoạt động · Chưa có thông tin ngày hết hạn'
+                  : 'Chưa có gói trả phí đang hoạt động'}
             </div>
           </div>
         </div>
