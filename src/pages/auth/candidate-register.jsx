@@ -1,31 +1,29 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { BriefcaseBusiness, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { BriefcaseBusiness, Eye, EyeOff, Lock, Mail, Phone, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { authService } from '@/services/auth-service';
-import { useAuth } from '@/hooks/use-auth';
-import { loginSchema } from '@/schemas/login-schema';
 import { ROUTES } from '@/configs/routes';
 import { APP_NAME } from '@/constants';
 import { extractErrorMessage } from '@/lib/extract-error';
-import { useChatbotStore } from '@/stores/chatbot-store';
+import { candidateRegisterSchema } from '@/schemas/candidate-register-schema';
+import { candidateService } from '@/services/candidate-service';
 
-export default function CandidateLogin() {
+export default function CandidateRegister() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [values, setValues] = useState({ email: location.state?.email || '', password: '' });
+  const [values, setValues] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+  });
   const [errors, setErrors] = useState({});
-
-  const chatContext = location.state?.chatContext;
-  const from = location.state?.from || ROUTES.HOME;
 
   const setField = (field) => (event) => {
     setValues((currentValues) => ({
@@ -43,7 +41,7 @@ export default function CandidateLogin() {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const result = loginSchema.safeParse(values);
+    const result = candidateRegisterSchema.safeParse(values);
 
     if (!result.success) {
       const fieldErrors = {};
@@ -56,25 +54,15 @@ export default function CandidateLogin() {
 
     setSubmitting(true);
     try {
-      const data = await authService.candidateLogin(result.data);
+      const data = await candidateService.create(result.data);
 
-      if (!data?.accessToken || !data?.user) {
-        throw new Error('Invalid login response');
-      }
-
-      setAuth({
-        user: data.user,
-        accessToken: data.accessToken,
+      toast.success(`Đăng ký thành công${data?.name ? ` cho ${data.name}` : ''}`);
+      navigate(ROUTES.CANDIDATE_LOGIN, {
+        replace: true,
+        state: { email: result.data.email },
       });
-
-      if (chatContext) {
-        useChatbotStore.getState().openChat(chatContext);
-      }
-
-      toast.success(data.message || 'Login successful');
-      navigate(from, { replace: true });
     } catch (error) {
-      toast.error(extractErrorMessage(error, 'Login failed'));
+      toast.error(extractErrorMessage(error, 'Đăng ký tài khoản thất bại'));
     } finally {
       setSubmitting(false);
     }
@@ -88,11 +76,28 @@ export default function CandidateLogin() {
         </div>
         <div className="space-y-1">
           <CardTitle className="text-2xl">{APP_NAME}</CardTitle>
-          <CardDescription>Đăng nhập ứng viên để ứng tuyển và hỏi AI về job</CardDescription>
+          <CardDescription>Đăng ký tài khoản ứng viên</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={onSubmit} className="space-y-4" autoComplete="off">
+          <div className="space-y-2">
+            <Label htmlFor="candidate-name">Họ tên</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="candidate-name"
+                type="text"
+                placeholder="Nhập họ tên"
+                className="pl-10"
+                value={values.name}
+                onChange={setField('name')}
+                autoComplete="name"
+              />
+            </div>
+            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="candidate-email">Email</Label>
             <div className="relative">
@@ -111,6 +116,23 @@ export default function CandidateLogin() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="candidate-phone">Số điện thoại</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="candidate-phone"
+                type="tel"
+                placeholder="Nhập số điện thoại"
+                className="pl-10"
+                value={values.phone}
+                onChange={setField('phone')}
+                autoComplete="tel"
+              />
+            </div>
+            {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="candidate-password">Mật khẩu</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -121,7 +143,7 @@ export default function CandidateLogin() {
                 className="px-10"
                 value={values.password}
                 onChange={setField('password')}
-                autoComplete="current-password"
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -137,22 +159,13 @@ export default function CandidateLogin() {
           </div>
 
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? 'Đang đăng nhập...' : 'Đăng nhập ứng viên'}
+            {submitting ? 'Đang đăng ký...' : 'Đăng ký tài khoản'}
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
-            Chưa có tài khoản?{' '}
-            <Link
-              to={ROUTES.CANDIDATE_REGISTER}
-              className="font-medium text-primary hover:underline"
-            >
-              Đăng ký ứng viên
-            </Link>
-          </div>
-
-          <div className="text-center text-sm text-muted-foreground">
-            <Link to={ROUTES.LOGIN} className="font-medium text-primary hover:underline">
-              Đăng nhập nhân viên
+            Đã có tài khoản?{' '}
+            <Link to={ROUTES.CANDIDATE_LOGIN} className="font-medium text-primary hover:underline">
+              Đăng nhập ứng viên
             </Link>
           </div>
         </form>
