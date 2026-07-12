@@ -10,4 +10,10 @@ export const candidateService = {
       phone,
     });
   },
+  async updatePassword(id, { oldPassword, newPassword }) {
+    return http.put(API_ENDPOINTS.CANDIDATE.UPDATE(id), {
+      oldPassword,
+      newPassword,
+    });
+  },
 };
