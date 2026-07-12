@@ -5,5 +5,8 @@ export const API_ENDPOINTS = {
     LOGOUT: 'auth/logout',
     PROFILE: 'auth/profile',
   },
+  CANDIDATE: {
+    CREATE: 'candidate',
+  },
   // Endpoints từng trang nằm trong src/pages/<name>/constants
 };
