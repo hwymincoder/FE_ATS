@@ -1,9 +1,10 @@
 export const JOB_ENDPOINTS = {
   POSTED: '/recruiter/jobs/getAll',
+  ALL: '/recruiter/jobs/all',
 };
 
 export const JOB_QUERY_KEYS = {
-  all: ['home', 'jobs', 'posted'],
+  all: ['home', 'jobs', 'all'],
   posted: (params) => ['home', 'jobs', 'posted', params],
 };
 

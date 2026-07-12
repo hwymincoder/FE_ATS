@@ -11,9 +11,13 @@ import RoleRoute from '@/routes/role-route';
 import { publicRoutes } from '@/routes/public-routes';
 import { privateRoutes } from '@/routes/private-routes';
 import { ROUTES } from '@/configs/routes';
+import { ROLES } from '@/constants';
+import PaymentCallbackHandler from '@/pages/candidate/payments/payment-callback-handler';
 
 const HomePage = lazy(() => import('@/pages/homes/home'));
 const JobsPage = lazy(() => import('@/pages/homes/jobs'));
+const CandidateUpgradePage = lazy(() => import('@/pages/candidate/upgrade'));
+const CandidateCheckoutPage = lazy(() => import('@/pages/candidate/checkout'));
 
 export default function AppRouter() {
   return (
@@ -28,6 +32,26 @@ export default function AppRouter() {
 
           <Route path={ROUTES.HOME} element={<HomeLayout />}>
             <Route index element={<HomePage />} />
+            <Route
+              path={ROUTES.CANDIDATE_UPGRADE}
+              element={
+                <ProtectedRoute>
+                  <RoleRoute allowedRoles={[ROLES.CANDIDATE]}>
+                    <CandidateUpgradePage />
+                  </RoleRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CANDIDATE_CHECKOUT}
+              element={
+                <ProtectedRoute>
+                  <RoleRoute allowedRoles={[ROLES.CANDIDATE]}>
+                    <CandidateCheckoutPage />
+                  </RoleRoute>
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           <Route path="/home" element={<Navigate to={ROUTES.HOME} replace />} />
@@ -57,6 +81,7 @@ export default function AppRouter() {
       </Suspense>
 
       <CandidateChatGate />
+      <PaymentCallbackHandler />
     </BrowserRouter>
   );
 }
