@@ -10,7 +10,7 @@ import ProtectedRoute from '@/routes/protected-route';
 import RoleRoute from '@/routes/role-route';
 import { publicRoutes } from '@/routes/public-routes';
 import { privateRoutes } from '@/routes/private-routes';
-import { ROUTES } from '@/configs/routes';
+import { ROUTES, ROUTE_ACCESS } from '@/configs/routes';
 import { ROLES } from '@/constants';
 import PaymentCallbackHandler from '@/pages/candidate/payments/payment-callback-handler';
 
@@ -74,7 +74,9 @@ export default function AppRouter() {
           <Route
             element={
               <ProtectedRoute>
-                <MainLayout />
+                <RoleRoute allowedRoles={ROUTE_ACCESS.STAFF} redirectTo={ROUTES.HOME}>
+                  <MainLayout />
+                </RoleRoute>
               </ProtectedRoute>
             }
           >

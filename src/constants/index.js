@@ -1,4 +1,4 @@
-export const APP_NAME = 'FE_ATS';
+export const APP_NAME = 'BVBank Careers';
 
 export const ROLES = {
   ADMIN: 'ADMIN',

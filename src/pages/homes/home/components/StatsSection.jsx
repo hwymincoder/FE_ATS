@@ -17,7 +17,7 @@ export default function StatsSection() {
         <SectionTitle
           tone="white"
           eyebrow="Vì sao chọn BVBank"
-          title="Nơi làm việc hàng đầu cho người Việt"
+          title="Môi trường để bạn phát triển dài lâu"
         />
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {STATS.map((s) => {

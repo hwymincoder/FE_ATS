@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth-store';
 const baseURL = import.meta.env.VITE_API_URL || '/api';
 const appBasePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 const loginPath = `${appBasePath}/candidate/login`;
-const staffLoginPath = `${appBasePath}/login`;
+const staffLoginPath = `${appBasePath}/staff/login`;
 const candidateLoginPath = `${appBasePath}/candidate/login`;
 const authPaths = [staffLoginPath, candidateLoginPath];
 

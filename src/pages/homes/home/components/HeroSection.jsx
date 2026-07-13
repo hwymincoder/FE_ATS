@@ -41,14 +41,14 @@ export default function HeroSection() {
           className="mb-5 border border-white/30 bg-bv-primary-deep/60 text-white shadow-lg backdrop-blur-md"
           style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)' }}
         >
-          Tuyển dụng BVBank 2026
+          Cơ hội nghề nghiệp tại BVBank
         </Badge>
         <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
-          Cùng BVBank kiến tạo tương lai
+          Cùng BVBank vững bước sự nghiệp
         </h1>
         <p className="mt-5 max-w-2xl text-base text-white/85 sm:text-lg">
-          Gia nhập đội ngũ 8.000+ cán bộ nhân viên trên hành trình chuyển đổi số và phát triển bền vững.
-          Khám phá cơ hội nghề nghiệp phù hợp với bạn.
+          Khám phá môi trường làm việc năng động, cơ hội phát triển rõ ràng và những vị trí phù hợp
+          để cùng chúng tôi tạo nên giá trị bền vững cho khách hàng Việt.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           {HERO_CTAS.map((cta) => (
