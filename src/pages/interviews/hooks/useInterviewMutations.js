@@ -13,7 +13,7 @@ export const useUpdateInterviewResult = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: INTERVIEW_QUERY_KEYS.lists(), exact: false });
       options.onSuccess?.(data);
     },
-    onError: (err) => {
+    onError: () => {
       toast.error(options.errorMessage || 'Cập nhật kết quả thất bại');
     },
   });

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CalendarPlaceholder = ({ items = [], onItemClick }) => {
   if (!items.length) return <div>Không có sự kiện để hiển thị trên lịch.</div>;
 
