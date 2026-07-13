@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronDown, KeyRound, LogIn, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
+import { Bell, ChevronDown, History, KeyRound, LogIn, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -251,6 +251,13 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
                     <DropdownMenuSeparator />
                     {user.role === ROLES.CANDIDATE && (
                       <>
+                        <DropdownMenuItem
+                          onSelect={() => navigate(ROUTES.CANDIDATE_APPLICATIONS)}
+                          className="cursor-pointer px-4 py-3"
+                        >
+                          <History className="mr-2 h-4 w-4" />
+                          Lịch sử ứng tuyển
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={() => navigate(ROUTES.CANDIDATE_CHANGE_PASSWORD)}
                           className="cursor-pointer px-4 py-3"

@@ -19,6 +19,7 @@ const JobsPage = lazy(() => import('@/pages/homes/jobs'));
 const CandidateUpgradePage = lazy(() => import('@/pages/candidate/upgrade'));
 const CandidateCheckoutPage = lazy(() => import('@/pages/candidate/checkout'));
 const CandidateChangePasswordPage = lazy(() => import('@/pages/candidate/change-password'));
+const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/applications'));
 
 export default function AppRouter() {
   return (
@@ -49,6 +50,16 @@ export default function AppRouter() {
                 <ProtectedRoute>
                   <RoleRoute allowedRoles={[ROLES.CANDIDATE]}>
                     <CandidateChangePasswordPage />
+                  </RoleRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CANDIDATE_APPLICATIONS}
+              element={
+                <ProtectedRoute>
+                  <RoleRoute allowedRoles={[ROLES.CANDIDATE]}>
+                    <CandidateApplicationsPage />
                   </RoleRoute>
                 </ProtectedRoute>
               }
