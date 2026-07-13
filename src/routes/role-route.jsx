@@ -4,11 +4,11 @@ import { ROUTES } from '@/configs/routes';
 import { useAuth } from '@/hooks/use-auth';
 import { hasAllowedRole } from '@/lib/authorization';
 
-export default function RoleRoute({ allowedRoles, children }) {
+export default function RoleRoute({ allowedRoles, redirectTo = ROUTES.FORBIDDEN, children }) {
   const { user } = useAuth();
 
   if (!hasAllowedRole(user?.role, allowedRoles)) {
-    return <Navigate to={ROUTES.FORBIDDEN} replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return children;

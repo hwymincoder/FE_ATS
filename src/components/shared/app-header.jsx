@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, ChevronDown, KeyRound, LogIn, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +16,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { useUiStore } from '@/stores/ui-store';
-import { APP_NAME, ROLES } from '@/constants';
+import { ROLES } from '@/constants';
 import { NAV_ITEMS, ROUTES } from '@/configs/routes';
 import { cn } from '@/lib/utils';
+import bvbankLogo from '@/assets/logo-bv.png';
 
 function scrollToId(id) {
   const el = document.querySelector(id);
@@ -73,9 +74,17 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
   const { user, clearAuth } = useAuth();
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname !== ROUTES.HOME || !location.hash) return;
+
+    const frameId = window.requestAnimationFrame(() => scrollToId(location.hash));
+    return () => window.cancelAnimationFrame(frameId);
+  }, [location.pathname, location.hash]);
 
   const handleLogout = () => {
     setLogoutDialogOpen(false);
@@ -97,7 +106,11 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
     if (isAnchor) {
       const handleClick = (e) => {
         e.preventDefault();
-        scrollToId(item.href);
+        if (location.pathname === ROUTES.HOME) {
+          scrollToId(item.href);
+        } else {
+          navigate({ pathname: ROUTES.HOME, hash: item.href });
+        }
         onNavigate?.();
       };
       return (
@@ -152,39 +165,14 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
   return (
     <header className="sticky top-0 z-50 bg-background shadow-sm">
       <div className="flex h-16 items-stretch">
-        {/* Logo zone - gradient BVBank with slanted right edge */}
+        {/* BVBank logo */}
         <button
           type="button"
           onClick={() => navigate(ROUTES.HOME)}
           aria-label="Về trang chủ"
-          className="relative flex cursor-pointer items-center gap-3 border-0 px-5 text-left text-white transition-[filter] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
-          style={{
-            background:
-              'linear-gradient(135deg, hsl(var(--bv-primary-deep)) 0%, hsl(var(--bv-primary)) 50%, hsl(var(--bv-secondary)) 100%)',
-            clipPath: 'polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%)',
-            minWidth: '260px',
-          }}
+          className="flex min-w-[210px] cursor-pointer items-center justify-center border-0 bg-white px-4 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-bv-primary sm:min-w-[240px]"
         >
-          {/* Logo 3 tam giác BVBank */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white/15 backdrop-blur-sm">
-            <svg
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 3 L21 20 L3 20 Z" fill="white" stroke="white" />
-              <path d="M12 9 L17 20 L7 20 Z" fill="hsl(var(--bv-secondary))" stroke="white" />
-              <path d="M12 14 L14 20 L10 20 Z" fill="white" />
-            </svg>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold tracking-wide">{APP_NAME}</span>
-            <span className="text-[10px] uppercase tracking-widest text-white/70">
-              ATS
-            </span>
-          </div>
+          <img src={bvbankLogo} alt="BVBank - Ngân hàng Bản Việt" className="h-14 w-48 object-contain" />
         </button>
 
         {/* Right zone - white background */}
@@ -321,7 +309,7 @@ export default function AppHeader({ navItems = NAV_ITEMS }) {
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <path d="M0,0 L260,0 L288,12 L0,24 Z" fill="hsl(var(--bv-primary))" />
+        <path d="M0,0 L240,0 L268,12 L0,24 Z" fill="hsl(var(--bv-primary))" />
         <path
           d="M260,0 L1200,0 L1200,8 C900,18 600,4 288,12 L260,0 Z"
           fill="hsl(var(--bv-accent-soft))"

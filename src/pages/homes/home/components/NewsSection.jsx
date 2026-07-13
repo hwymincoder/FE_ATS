@@ -11,7 +11,7 @@ export default function NewsSection() {
   return (
     <section id="news" className="bg-muted/40 py-20">
       <div className="mx-auto max-w-6xl px-6">
-        <SectionTitle eyebrow="Tin tức & sự kiện" title="Cập nhật mới nhất từ BVBank" />
+        <SectionTitle eyebrow="Tin tuyển dụng" title="Hoạt động và cơ hội tại BVBank" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {NEWS.map((n) => (
             <Card

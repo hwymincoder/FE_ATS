@@ -52,7 +52,7 @@ export default function ContactFooterSection() {
               </span>
             </div>
             <p className="text-sm text-white/75">
-              Ngân hàng TMCP Bản Việt — đối tác tài chính tin cậy cho mọi gia đình Việt.
+              Cổng thông tin tuyển dụng chính thức của Ngân hàng TMCP Bản Việt.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export default function ContactFooterSection() {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/60">
-          © {new Date().getFullYear()} {APP_NAME} — Ngân hàng TMCP Bản Việt. All rights reserved.
+          © {new Date().getFullYear()} Ngân hàng TMCP Bản Việt. Bảo lưu mọi quyền.
         </div>
       </div>
     </footer>

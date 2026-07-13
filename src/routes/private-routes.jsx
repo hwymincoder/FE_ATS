@@ -18,6 +18,7 @@ export const privateRoutes = [
   {
     path: ROUTES.DASHBOARD,
     element: <Dashboard />,
+    allowedRoles: ROUTE_ACCESS.DASHBOARD,
   },
   {
     path: '/departments',

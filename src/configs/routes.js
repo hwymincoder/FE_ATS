@@ -1,7 +1,7 @@
 import { ROLES } from '@/constants';
 
 export const ROUTES = {
-  LOGIN: '/login',
+  LOGIN: '/staff/login',
   CANDIDATE_LOGIN: '/candidate/login',
   CANDIDATE_REGISTER: '/candidate/register',
   HOME: '/',
@@ -13,6 +13,8 @@ export const ROUTES = {
 };
 
 export const ROUTE_ACCESS = {
+  STAFF: [ROLES.ADMIN, ROLES.RECRUITER, ROLES.INTERVIEWER],
+  DASHBOARD: [ROLES.ADMIN, ROLES.RECRUITER, ROLES.INTERVIEWER],
   DEPARTMENTS: [ROLES.ADMIN],
   PIPELINE_STAGES: [ROLES.ADMIN],
   UPGRADE_PACKAGES: [ROLES.ADMIN],
@@ -28,6 +30,7 @@ export const NAV_ITEMS = [
     label: 'Dashboard',
     path: ROUTES.DASHBOARD,
     icon: 'LayoutDashboard',
+    allowedRoles: ROUTE_ACCESS.DASHBOARD,
   },
   {
     key: 'departments',

@@ -126,6 +126,7 @@ function JobsGrid({ jobs, isLoading, isError, onApply }) {
   const navigate = useNavigate();
   const { user, accessToken } = useAuth();
   const openChat = useChatbotStore((s) => s.openChat);
+  const canApply = !accessToken || user?.role === ROLES.CANDIDATE;
 
   const handleAskAi = (job) => {
     const chatContext = {
@@ -200,22 +201,26 @@ function JobsGrid({ jobs, isLoading, isError, onApply }) {
                 )}
               </div>
               <div className="mt-5 space-y-2">
-                <Button
-                  className="w-full gap-2 transition-colors hover:bg-bv-primary hover:text-white hover:border-bv-primary"
-                  variant="outline"
-                  onClick={() => onApply?.(job)}
-                >
-                  Ứng tuyển
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  className="w-full gap-2"
-                  variant="secondary"
-                  onClick={() => handleAskAi(job)}
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Hỏi AI
-                </Button>
+                {canApply && (
+                  <Button
+                    className="w-full gap-2 transition-colors hover:bg-bv-primary hover:text-white hover:border-bv-primary"
+                    variant="outline"
+                    onClick={() => onApply?.(job)}
+                  >
+                    Ứng tuyển
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+                {canApply && (
+                  <Button
+                    className="w-full gap-2"
+                    variant="secondary"
+                    onClick={() => handleAskAi(job)}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Hỏi AI
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

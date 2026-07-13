@@ -8,9 +8,9 @@ export default function AboutSection() {
     <section id="about" className="bg-background py-20">
       <div className="mx-auto max-w-6xl px-6">
         <SectionTitle
-          eyebrow="Về chúng tôi"
-          title="Ngân hàng TMCP Bản Việt"
-          subtitle="Hơn 30 năm đồng hành cùng khách hàng Việt, BVBank tự hào là một trong những ngân hàng bán lẻ năng động, an toàn và minh bạch."
+          eyebrow="Về BVBank"
+          title="Nơi tài năng cùng tạo nên giá trị"
+          subtitle="Tại Ngân hàng TMCP Bản Việt, mỗi thành viên đều có cơ hội học hỏi, phát triển và đóng góp vào hành trình xây dựng một ngân hàng bán lẻ hiện đại."
         />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
