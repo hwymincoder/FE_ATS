@@ -19,19 +19,12 @@ export const ROUTE_ACCESS = {
   PIPELINE_STAGES: [ROLES.ADMIN],
   UPGRADE_PACKAGES: [ROLES.ADMIN],
   USERS: [ROLES.ADMIN],
-  INTERVIEWS: [ROLES.ADMIN, ROLES.INTERVIEWER],
+  INTERVIEWS: [ROLES.INTERVIEWER],
   RECRUITER: [ROLES.RECRUITER],
   CANDIDATE: [ROLES.CANDIDATE],
 };
 
 export const NAV_ITEMS = [
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    path: ROUTES.DASHBOARD,
-    icon: 'LayoutDashboard',
-    allowedRoles: ROUTE_ACCESS.DASHBOARD,
-  },
   {
     key: 'departments',
     label: 'Phòng ban',
