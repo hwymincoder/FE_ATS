@@ -11,21 +11,44 @@ const normalizeInterviewResponse = (item) => ({
       : undefined),
   jobTitle: item.jobTitle || item.position,
   feedback: item.feedback ?? item.note ?? item.feedBack,
+  candidateName: item.candidateName || item.candidate?.name,
+  candidateEmail: item.candidateEmail || item.candidate?.email,
+  candidatePhone: item.candidatePhone || item.candidate?.phone,
 });
 
 export const fetchInterviewList = async (params) => {
-  const response = await http.get(INTERVIEW_ENDPOINTS.LIST, { params });
+  const normalizedParams = {
+    page: Math.max(Number(params?.page ?? 1), 1),
+    size: Number(params?.size ?? 10),
+  };
+  const response = await http.get(INTERVIEW_ENDPOINTS.LIST, { params: normalizedParams });
 
   if (Array.isArray(response)) {
+    const items = response.map(normalizeInterviewResponse);
     return {
-      data: response.map(normalizeInterviewResponse),
-      total: response.length,
+      items,
+      data: items,
+      page: normalizedParams.page,
+      size: normalizedParams.size,
+      totalItems: response.length,
+      totalPages: 1,
+      hasNext: false,
+      hasPrevious: false,
     };
   }
 
+  const items = (response?.items ?? response?.data ?? []).map(normalizeInterviewResponse);
+
   return {
-    data: (response?.items ?? response?.data ?? []).map(normalizeInterviewResponse),
-    total: response?.totalItems ?? response?.total ?? 0,
+    ...response,
+    items,
+    data: items,
+    page: Number(response?.page ?? normalizedParams.page),
+    size: Number(response?.size ?? normalizedParams.size),
+    totalItems: Number(response?.totalItems ?? response?.total ?? items.length),
+    totalPages: Number(response?.totalPages ?? 1),
+    hasNext: Boolean(response?.hasNext),
+    hasPrevious: Boolean(response?.hasPrevious),
   };
 };
 
