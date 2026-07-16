@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { extractErrorMessage } from '@/lib/extract-error';
 import { cn } from '@/lib/utils';
+import { viewRecruiterCv, downloadRecruiterCv } from '@/pages/recruiter/applications/services/recruiter-cv-service';
 import {
     APPLICATION_PRIORITY,
     getApplicationPriorityBadgeVariant,
@@ -158,6 +159,7 @@ function ApplicationCard({
     onMoveStage,
     onOpenDetail,
     onOpenSchedule,
+    onViewCv,
     stages,
 }) {
     const stageOptions = getStageOptions(stages, currentStage);
@@ -224,16 +226,17 @@ function ApplicationCard({
                     <span className="truncate">{formatDateTime(application.interviewScheduledAt)}</span>
                 </div>
                 {application.cvFilePath && (
-                    <a
-                        href={application.cvFilePath}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(event) => event.stopPropagation()}
-                        className="flex items-center gap-2 text-primary hover:underline"
+                    <button
+                        type="button"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onViewCv?.(application.applicationId, application.cvFileType);
+                        }}
+                        className="flex items-center gap-2 w-full text-left text-primary hover:underline cursor-pointer bg-transparent border-0 p-0"
                     >
                         <FileText className="h-4 w-4 shrink-0" />
                         <span className="truncate">Xem CV {application.cvFileType ? `(${application.cvFileType})` : ''}</span>
-                    </a>
+                    </button>
                 )}
                 <select
                     value={currentStage.stageId}
@@ -283,6 +286,7 @@ function KanbanColumn({
     onOpenDetail,
     onMoveStage,
     onOpenSchedule,
+    onViewCv,
     stages,
 }) {
     const applications = stage.applications ?? [];
@@ -324,6 +328,7 @@ function KanbanColumn({
                             onOpenDetail={onOpenDetail}
                             onMoveStage={onMoveStage}
                             onOpenSchedule={onOpenSchedule}
+                            onViewCv={onViewCv}
                             stages={stages}
                         />
                     ))
@@ -459,6 +464,14 @@ export default function RecruiterApplicationKanbanPage() {
         });
     };
 
+    const handleViewCv = async (applicationId, fileType) => {
+        try {
+            await viewRecruiterCv(applicationId, null, fileType);
+        } catch {
+            toast.error('Không thể mở file CV. Vui lòng thử lại.');
+        }
+    };
+
     const handleScheduleFieldChange = (field, value) => {
         setScheduleForm((current) => ({ ...current, [field]: value }));
     };
@@ -550,6 +563,7 @@ export default function RecruiterApplicationKanbanPage() {
                                 onMoveStage={(applicationId, toStageId) =>
                                     handleMoveStage(applicationId, toStageId, stage.stageId)
                                 }
+                                onViewCv={handleViewCv}
                                 stages={stages}
                             />
                         ))}
@@ -737,15 +751,14 @@ export default function RecruiterApplicationKanbanPage() {
                                 <DetailRow label="Stage hiện tại" value={applicationDetail.currentStage?.name} />
                                 <div className="space-y-1">
                                     <div className="text-xs font-medium uppercase text-muted-foreground">CV</div>
-                                    {applicationDetail.cv?.filePath ? (
-                                        <a
-                                            href={applicationDetail.cv.filePath}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-sm text-primary hover:underline"
+                                    {applicationDetail.cv?.id ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleViewCv(applicationDetail.applicationId, applicationDetail.cv?.fileType)}
+                                            className="text-sm text-primary hover:underline cursor-pointer bg-transparent border-0 p-0"
                                         >
                                             Xem CV {applicationDetail.cv.fileType ? `(${applicationDetail.cv.fileType})` : ''}
-                                        </a>
+                                        </button>
                                     ) : (
                                         <div className="text-sm">—</div>
                                     )}
