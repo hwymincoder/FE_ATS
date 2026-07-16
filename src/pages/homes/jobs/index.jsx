@@ -1,6 +1,6 @@
 import { ArrowLeft, MapPin } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ApplyJobDialog } from './components/ApplyJobDialog';
 import { Button } from '@/components/ui/button';
@@ -8,13 +8,28 @@ import { JobsSection } from '@/pages/homes/home/components';
 
 export default function JobsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  const applyContext = location.state?.applyContext;
+  const shouldPrefill = searchParams.get('prefill') === '1';
+
   const locationFilter = useMemo(() => {
     const raw = searchParams.get('location');
     return raw && raw.trim() ? raw.trim() : null;
   }, [searchParams]);
 
   const [openJob, setOpenJob] = useState(null);
+
+  useEffect(() => {
+    if (shouldPrefill && applyContext?.jobId) {
+      setOpenJob({
+        id: applyContext.jobId,
+        title: applyContext.jobTitle,
+      });
+      navigate(location.pathname, { replace: true });
+    }
+  }, [shouldPrefill, applyContext, navigate, location.pathname, location.search]);
 
   return (
     <div className="min-h-screen bg-muted/30">

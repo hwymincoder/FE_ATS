@@ -25,6 +25,7 @@ export default function CandidateLogin() {
   const [errors, setErrors] = useState({});
 
   const chatContext = location.state?.chatContext;
+  const applyContext = location.state?.applyContext;
   const from = location.state?.from || ROUTES.HOME;
 
   const setField = (field) => (event) => {
@@ -71,8 +72,19 @@ export default function CandidateLogin() {
         useChatbotStore.getState().openChat(chatContext);
       }
 
-      toast.success(data.message || 'Login successful');
-      navigate(from, { replace: true });
+      if (applyContext) {
+        toast.success(data.message || 'Đăng nhập thành công');
+        const returnPath = applyContext.jobId
+          ? `/home/jobs?jobId=${applyContext.jobId}&prefill=1`
+          : ROUTES.HOME;
+        navigate(returnPath, {
+          state: { applyContext },
+          replace: true,
+        });
+      } else {
+        toast.success(data.message || 'Login successful');
+        navigate(from, { replace: true });
+      }
     } catch (error) {
       toast.error(extractErrorMessage(error, 'Login failed'));
     } finally {
